@@ -1,0 +1,16 @@
+{
+  "name": "@twada/benchmark-commits",
+  "description": "Run benchmark on specified git commits",
+  "version": "0.0.1",
+  "author": {
+    "name": "Takuto Wada",
+    "email": "takuto.wada@gmail.com",
+    "url": "https://github.com/twada"
+  },
+  "main": "index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [],
+  "license": "MIT"
+}
