@@ -12,5 +12,15 @@
     "access": "public"
   },
   "keywords": [],
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "benchmark": "^2.1.4",
+    "extract-git-treeish": "^1.0.0"
+  },
+  "devDependencies": {
+    "mocha": "^8.0.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  }
 }
