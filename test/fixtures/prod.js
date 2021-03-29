@@ -1,3 +1,3 @@
 module.exports = function (str) {
-  return /o/.test(str);
+  return str.indexOf('o') > -1;
 };
