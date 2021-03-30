@@ -9,8 +9,13 @@ const zf = (n, len = 2) => String(n).padStart(len, '0');
 const ymd = (d = new Date()) => `${d.getFullYear()}${zf(d.getMonth() + 1)}${zf(d.getDate())}${zf(d.getHours())}${zf(d.getMinutes())}${zf(d.getSeconds())}${zf(d.getMilliseconds(), 3)}`;
 
 function runBenchmark (specs, register) {
-  prepareSuite(new Benchmark.Suite('benchmark-commits'), specs, register).then((suite) => {
-    suite.run({ async: true });
+  return new Promise((resolve, reject) => {
+    prepareSuite(new Benchmark.Suite('benchmark-commits'), specs, register).then((suite) => {
+      suite.run({ async: true });
+      suite.on('complete', function () {
+        resolve(suite);
+      });
+    });
   });
 }
 
