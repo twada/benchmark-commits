@@ -9,18 +9,20 @@ const zf = (n, len = 2) => String(n).padStart(len, '0');
 const ymd = (d = new Date()) => `${d.getFullYear()}${zf(d.getMonth() + 1)}${zf(d.getDate())}${zf(d.getHours())}${zf(d.getMinutes())}${zf(d.getSeconds())}${zf(d.getMilliseconds(), 3)}`;
 
 function runBenchmark (specs, register) {
+  const destDir = join(process.cwd(), ymd());
+  const suite = new Benchmark.Suite('benchmark-commits');
   return new Promise((resolve, reject) => {
-    prepareSuite(new Benchmark.Suite('benchmark-commits'), specs, register).then((suite) => {
-      suite.run({ async: true });
+    prepareSuite(suite, destDir, specs, register).then((suite) => {
       suite.on('complete', function () {
+        rmdirSync(destDir, { recursive: true });
         resolve(suite);
       });
+      suite.run({ async: true });
     });
   });
 }
 
-function prepareSuite (suite, specs, register) {
-  const destDir = join(process.cwd(), ymd());
+function prepareSuite (suite, destDir, specs, register) {
   console.log(`prepare ${specs.length} experiments`);
   const tasks = specs.map((spec) => {
     return new Promise((resolve, reject) => {
@@ -55,7 +57,6 @@ function prepareSuite (suite, specs, register) {
     });
     suite.on('complete', function () {
       console.log('suite completed: fastest is [' + this.filter('fastest').map('name') + ']');
-      rmdirSync(destDir, { recursive: true });
     });
     return suite;
   });
@@ -63,5 +64,6 @@ function prepareSuite (suite, specs, register) {
 
 module.exports = {
   runBenchmark,
-  prepareSuite
+  prepareSuite,
+  ymd
 };

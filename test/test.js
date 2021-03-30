@@ -1,7 +1,20 @@
 delete require.cache[require.resolve('..')];
-const { runBenchmark, prepareSuite } = require('..');
+const { runBenchmark, prepareSuite, ymd } = require('..');
 const Benchmark = require('benchmark');
+const os = require('os');
+const fs = require('fs');
+const path = require('path');
 const assert = require('assert').strict;
+const EventEmitter = require('events');
+class FakeBenchmarkSuite extends EventEmitter {
+  constructor() {
+    super();
+    this.addCalls = [];
+  }
+  add(name, fn, options) {
+    this.addCalls.push({name, fn, options});
+  }
+}
 
 describe('benchmark-commits: Run benchmark on specified git commits', () => {
   const specs = [
@@ -32,40 +45,28 @@ describe('benchmark-commits: Run benchmark on specified git commits', () => {
     });
   });
 
-  it('prepareSuite(suite, specs, register)', (done) => {
-    const logs = [];
-    const suite = new Benchmark.Suite('benchmark-commits', {
-      onStart: function (event) {
-        logs.push(`onStart`);
-      },
-      onCycle: function (event) {
-        logs.push(`onCycle`);
-      },
-      onComplete: function (event) {
-        logs.push(`onComplete`);
+  describe('prepareSuite(suite, specs, register)', () => {
+    let targetDir;
+    beforeEach(() => {
+      targetDir = path.join(os.tmpdir(), ymd());
+    });
+    afterEach(() => {
+      if (fs.existsSync(targetDir)) {
+        fs.rmdirSync(targetDir, { recursive: true });
       }
     });
-    prepareSuite(suite, specs, ({ suite, spec, dir }) => {
-      const prod = require(`${dir}/test/fixtures/prod`);
-      return () => {
-        prod('Hello World!');
-      };
-    }).then((suite) => {
-      logs.push(`before calling suite.run`);
-      suite.run({ async: true });
-      logs.push(`after calling suite.run`);
-      suite.on('complete', function () {
-        assert.deepStrictEqual(logs, [
-          'before calling suite.run',
-          'onStart',
-          'after calling suite.run',
-          'onCycle',
-          'onCycle',
-          'onCycle',
-          'onComplete'
-        ]);
+    it('add benchmark for each experiment', (done) => {
+      const suite = new FakeBenchmarkSuite();
+      prepareSuite(suite, targetDir, specs, ({ suite, spec, dir }) => {
+        const prod = require(`${dir}/test/fixtures/prod`);
+        return () => {
+          prod('Hello World!');
+        };
+      }).then((suite) => {
+        assert(suite.addCalls.length === 3);
         done();
       });
     });
   });
+
 });
