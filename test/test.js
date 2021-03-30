@@ -1,5 +1,6 @@
 delete require.cache[require.resolve('..')];
-const { runBenchmark, prepareSuite, ymd } = require('..');
+const { runBenchmark } = require('..');
+const { prepareSuite, ymd } = require('../prepare');
 const Benchmark = require('benchmark');
 const os = require('os');
 const fs = require('fs');
