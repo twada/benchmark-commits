@@ -1,9 +1,10 @@
 delete require.cache[require.resolve('..')];
-const { runBench } = require('..');
+const { runBench, prepareSuite } = require('..');
+const Benchmark = require('benchmark');
 const assert = require('assert').strict;
 
 describe('benchmark-commits: Run benchmark on specified git commits', () => {
-  it('runBench(specs, register, benchmarkOptions)', (done) => {
+  it('prepareSuite(suite, specs, register)', (done) => {
     const logs = [];
     const specs = [
       {
@@ -19,12 +20,7 @@ describe('benchmark-commits: Run benchmark on specified git commits', () => {
         git: 'bench-test-3'
       }
     ];
-    runBench(specs, ({ suite, spec, dir }) => {
-      const prod = require(`${dir}/test/fixtures/prod`);
-      return () => {
-        prod('Hello World!');
-      };
-    }, {
+    const suite = new Benchmark.Suite('benchmark-commits', {
       onStart: function (event) {
         logs.push(`onStart`);
       },
@@ -33,15 +29,29 @@ describe('benchmark-commits: Run benchmark on specified git commits', () => {
       },
       onComplete: function (event) {
         logs.push(`onComplete`);
+      }
+    });
+    prepareSuite(suite, specs, ({ suite, spec, dir }) => {
+      const prod = require(`${dir}/test/fixtures/prod`);
+      return () => {
+        prod('Hello World!');
+      };
+    }).then((suite) => {
+      logs.push(`before calling suite.run`);
+      suite.run({ async: true });
+      logs.push(`after calling suite.run`);
+      suite.on('complete', function () {
         assert.deepStrictEqual(logs, [
+          'before calling suite.run',
           'onStart',
+          'after calling suite.run',
           'onCycle',
           'onCycle',
           'onCycle',
           'onComplete'
         ]);
         done();
-      }
+      });
     });
   });
 });

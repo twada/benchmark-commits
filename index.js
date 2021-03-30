@@ -8,8 +8,13 @@ const { extract } = require('extract-git-treeish');
 const zf = (n, len = 2) => String(n).padStart(len, '0');
 const ymd = (d = new Date()) => `${d.getFullYear()}${zf(d.getMonth() + 1)}${zf(d.getDate())}${zf(d.getHours())}${zf(d.getMinutes())}${zf(d.getSeconds())}${zf(d.getMilliseconds(), 3)}`;
 
-function runBench (specs, register, benchmarkOptions) {
-  const suite = new Benchmark.Suite('benchmark-commits', benchmarkOptions);
+function runBenchmark (specs, register) {
+  prepareSuite(new Benchmark.Suite('benchmark-commits'), specs, register).then((suite) => {
+    suite.run({ async: true });
+  });
+}
+
+function prepareSuite (suite, specs, register) {
   const destDir = join(process.cwd(), ymd());
   console.log(`prepare ${specs.length} experiments`);
   const tasks = specs.map((spec) => {
@@ -28,11 +33,12 @@ function runBench (specs, register, benchmarkOptions) {
       }).catch(reject);
     });
   });
-  Promise.all(tasks).then(results => {
+  return Promise.all(tasks).then(results => {
     for (const { spec, dir } of results) {
       console.log(`register benchmark of ${spec.name}(${spec.git})`);
       const fn = register({ suite, spec, dir });
       if (typeof fn === 'function') {
+        // suite.add(`${spec.name}(${spec.git})`, fn, howToDesignOptions);
         suite.add(`${spec.name}(${spec.git})`, fn);
       }
     }
@@ -43,13 +49,14 @@ function runBench (specs, register, benchmarkOptions) {
       console.log(`finish benchmark of ${event.target}`);
     });
     suite.on('complete', function () {
-      console.log('finish benchmark suite: fastest is [' + this.filter('fastest').map('name') + ']');
+      console.log('suite completed: fastest is [' + this.filter('fastest').map('name') + ']');
       rmdirSync(destDir, { recursive: true });
     });
-    suite.run({ async: true });
+    return suite;
   });
 };
 
 module.exports = {
-  runBench
+  runBenchmark,
+  prepareSuite
 };
