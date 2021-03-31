@@ -3,12 +3,28 @@
 const { join } = require('path');
 const { rmdirSync } = require('fs');
 const Benchmark = require('benchmark');
-const { prepareSuite, ymd } = require('./prepare');
+const { SuiteSetup, ymd } = require('./prepare');
 
 function runBenchmark (specs, register) {
   const destDir = join(process.cwd(), ymd());
+  const setup = new SuiteSetup(new Benchmark.Suite('benchmark-commits'), destDir);
+  setup.on('start', (specs) => {
+    console.log(`start preparation of ${specs.length} experiments`);
+  });
+  setup.on('finish', (specs) => {
+    console.log(`finish preparation of ${specs.length} experiments`);
+  });
+  setup.on('npm:install:start', (spec, dir) => {
+    console.log(`start npm install of ${spec.name}(${spec.git})`);
+  });
+  setup.on('npm:install:finish', (spec, dir) => {
+    console.log(`finish npm install of ${spec.name}(${spec.git})`);
+  });
+  setup.on('register', (spec, dir) => {
+    console.log(`register benchmark of ${spec.name}(${spec.git})`);
+  });
   return new Promise((resolve, reject) => {
-    prepareSuite(new Benchmark.Suite('benchmark-commits'), destDir, specs, register).then((suite) => {
+    setup.run(specs, register).then((suite) => {
       suite.on('start', function () {
         console.log('start benchmark suite');
       });

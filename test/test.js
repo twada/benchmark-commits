@@ -1,6 +1,6 @@
 delete require.cache[require.resolve('..')];
 const { runBenchmark } = require('..');
-const { prepareSuite, ymd } = require('../prepare');
+const { SuiteSetup, ymd } = require('../prepare');
 const Benchmark = require('benchmark');
 const os = require('os');
 const fs = require('fs');
@@ -8,12 +8,12 @@ const path = require('path');
 const assert = require('assert').strict;
 const EventEmitter = require('events');
 class FakeBenchmarkSuite extends EventEmitter {
-  constructor() {
+  constructor(calls) {
     super();
-    this.addCalls = [];
+    this.calls = calls;
   }
   add(name, fn, options) {
-    this.addCalls.push({name, fn, options});
+    this.calls.push({name, fn, options});
   }
 }
 
@@ -46,7 +46,7 @@ describe('benchmark-commits: Run benchmark on specified git commits', () => {
     });
   });
 
-  describe('prepareSuite(suite, specs, register)', () => {
+  describe('SuiteSetup#run(specs, register)', () => {
     let targetDir;
     beforeEach(() => {
       targetDir = path.join(os.tmpdir(), ymd());
@@ -57,14 +57,16 @@ describe('benchmark-commits: Run benchmark on specified git commits', () => {
       }
     });
     it('add benchmark for each experiment', (done) => {
-      const suite = new FakeBenchmarkSuite();
-      prepareSuite(suite, targetDir, specs, ({ suite, spec, dir }) => {
+      const calls = [];
+      const suite = new FakeBenchmarkSuite(calls);
+      const setup = new SuiteSetup(suite, targetDir);
+      setup.run(specs, ({ suite, spec, dir }) => {
         const prod = require(`${dir}/test/fixtures/prod`);
         return () => {
           prod('Hello World!');
         };
       }).then((suite) => {
-        assert(suite.addCalls.length === 3);
+        assert(calls.length === 3);
         done();
       });
     });
