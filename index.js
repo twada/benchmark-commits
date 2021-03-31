@@ -3,7 +3,7 @@
 const { join } = require('path');
 const { rmdirSync } = require('fs');
 const Benchmark = require('benchmark');
-const { SuiteSetup, ymd } = require('./prepare');
+const { SuiteSetup, ymd } = require('./suite-setup');
 
 function runBenchmark (specs, register) {
   const destDir = join(process.cwd(), ymd());
