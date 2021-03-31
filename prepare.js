@@ -33,15 +33,6 @@ function prepareSuite (suite, destDir, specs, register) {
         suite.add(`${spec.name}(${spec.git})`, fn);
       }
     }
-    suite.on('start', function () {
-      console.log('start benchmark suite');
-    });
-    suite.on('cycle', function (event) {
-      console.log(`finish benchmark of ${event.target}`);
-    });
-    suite.on('complete', function () {
-      console.log('suite completed: fastest is [' + this.filter('fastest').map('name') + ']');
-    });
     return suite;
   });
 };
