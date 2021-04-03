@@ -1,5 +1,5 @@
 delete require.cache[require.resolve('../suite-setup')];
-const { SuiteSetup, ymd } = require('../suite-setup');
+const { SuiteSetup, commitsToSpecs, ymd } = require('../suite-setup');
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
@@ -16,6 +16,60 @@ class FakeBenchmarkSuite extends EventEmitter {
 }
 
 describe('benchmark-commits: Run benchmark on specified git commits', () => {
+  describe('commitsToSpecs(commits)', () => {
+    it('normalize to specs', () => {
+      const commits = [
+        'bench-test-1',
+        'bench-test-2',
+        'bench-test-3',
+      ];
+      assert.deepEqual(commitsToSpecs(commits), [
+        {
+          name: 'bench-test-1',
+          git: 'bench-test-1'
+        },
+        {
+          name: 'bench-test-2',
+          git: 'bench-test-2'
+        },
+        {
+          name: 'bench-test-3',
+          git: 'bench-test-3'
+        }
+      ]);
+    });
+    it('nothing to do if already in name-git form', () => {
+      const commits = [
+        {
+          name: 'Regex#test',
+          git: 'bench-test-1'
+        },
+        {
+          name: 'String#indexOf',
+          git: 'bench-test-2'
+        },
+        {
+          name: 'String#match',
+          git: 'bench-test-3'
+        }
+      ];
+      assert.deepEqual(commitsToSpecs(commits), [
+        {
+          name: 'Regex#test',
+          git: 'bench-test-1'
+        },
+        {
+          name: 'String#indexOf',
+          git: 'bench-test-2'
+        },
+        {
+          name: 'String#match',
+          git: 'bench-test-3'
+        }
+      ]);
+    });
+  });
+
   let targetDir;
   beforeEach(() => {
     targetDir = path.join(os.tmpdir(), ymd());

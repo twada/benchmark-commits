@@ -3,9 +3,9 @@
 const { join } = require('path');
 const { rmdirSync } = require('fs');
 const Benchmark = require('benchmark');
-const { SuiteSetup, ymd } = require('./suite-setup');
+const { SuiteSetup, commitsToSpecs, ymd } = require('./suite-setup');
 
-function runBenchmark (specs, register) {
+function runBenchmark (commits, register) {
   const destDir = join(process.cwd(), ymd());
   const setup = new SuiteSetup(new Benchmark.Suite('benchmark-commits'), destDir);
   setup.on('start', (specs) => {
@@ -24,6 +24,7 @@ function runBenchmark (specs, register) {
     console.log(`register benchmark of ${spec.name}(${spec.git})`);
   });
   return new Promise((resolve, reject) => {
+    const specs = commitsToSpecs(commits);
     setup.run(specs, register).then((suite) => {
       suite.on('start', function () {
         console.log(`start suite of ${specs.length} benchmarks`);

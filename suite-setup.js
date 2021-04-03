@@ -49,7 +49,21 @@ class SuiteSetup extends EventEmitter {
   }
 }
 
+function commitsToSpecs(commits) {
+  return commits.map((commit) => {
+    if (typeof commit === 'string') {
+      return {
+        name: commit,
+        git: commit
+      };
+    } else {
+      return Object.assign({}, commit);
+    }
+  });
+}
+
 module.exports = {
   SuiteSetup,
+  commitsToSpecs,
   ymd
 };
