@@ -3,7 +3,7 @@
 const { join } = require('path');
 const { rmdirSync } = require('fs');
 const Benchmark = require('benchmark');
-const { SuiteSetup, commitsToSpecs, ymd } = require('./suite-setup');
+const { SuiteSetup, commitsToSpecs, specDesc, ymd } = require('./suite-setup');
 
 function runBenchmark (commits, register) {
   const destDir = join(process.cwd(), ymd());
@@ -15,13 +15,13 @@ function runBenchmark (commits, register) {
     console.log(`finish preparation of ${specs.length} benchmarks`);
   });
   setup.on('npm:install:start', (spec, dir) => {
-    console.log(`start npm install of ${spec.name}(${spec.git})`);
+    console.log(`start npm install of ${specDesc(spec)}`);
   });
   setup.on('npm:install:finish', (spec, dir) => {
-    console.log(`finish npm install of ${spec.name}(${spec.git})`);
+    console.log(`finish npm install of ${specDesc(spec)}`);
   });
   setup.on('register', (spec, dir) => {
-    console.log(`register benchmark of ${spec.name}(${spec.git})`);
+    console.log(`register benchmark of ${specDesc(spec)}`);
   });
   return new Promise((resolve, reject) => {
     const specs = commitsToSpecs(commits);

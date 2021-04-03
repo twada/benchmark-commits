@@ -40,7 +40,7 @@ class SuiteSetup extends EventEmitter {
         const fn = register({ suite, spec, dir });
         if (typeof fn === 'function') {
           // suite.add(`${spec.name}(${spec.git})`, fn, howToDesignOptions);
-          suite.add(`${spec.name}(${spec.git})`, fn);
+          suite.add(specDesc(spec), fn);
         }
       }
       setup.emit('finish', specs);
@@ -62,8 +62,17 @@ function commitsToSpecs(commits) {
   });
 }
 
+function specDesc(spec) {
+  if (spec.name !== spec.git) {
+    return `${spec.name}(${spec.git})`;
+  } else {
+    return spec.git;
+  }
+}
+
 module.exports = {
   SuiteSetup,
   commitsToSpecs,
+  specDesc,
   ymd
 };

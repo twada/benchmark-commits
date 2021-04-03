@@ -1,5 +1,5 @@
 delete require.cache[require.resolve('../suite-setup')];
-const { SuiteSetup, commitsToSpecs, ymd } = require('../suite-setup');
+const { SuiteSetup, commitsToSpecs, specDesc, ymd } = require('../suite-setup');
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
@@ -16,6 +16,23 @@ class FakeBenchmarkSuite extends EventEmitter {
 }
 
 describe('benchmark-commits: Run benchmark on specified git commits', () => {
+  describe('specDesc(spec)', () => {
+    it('commit-id only', () => {
+      const spec = {
+        name: 'bench-test-1',
+        git: 'bench-test-1'
+      };
+      assert(specDesc(spec) === 'bench-test-1');
+    });
+    it('name and commit-id', () => {
+      const spec = {
+        name: 'Regex#test',
+        git: 'bench-test-1'
+      };
+      assert(specDesc(spec) === 'Regex#test(bench-test-1)');
+    });
+  });
+
   describe('commitsToSpecs(commits)', () => {
     it('normalize to specs', () => {
       const commits = [
