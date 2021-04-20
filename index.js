@@ -26,6 +26,12 @@ function runBenchmark (commits, register) {
   return new Promise((resolve, reject) => {
     const specs = commitsToSpecs(commits);
     setup.run(specs, register).then((suite) => {
+      suite.on('abort', function () {
+        console.error(arguments);
+      });
+      suite.on('error', function (event) {
+        console.error(event.target.error);
+      });
       suite.on('start', function () {
         console.log(`start suite of ${specs.length} benchmarks`);
       });
