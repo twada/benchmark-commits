@@ -14,6 +14,13 @@ class FakeBenchmarkSuite extends EventEmitter {
     this.calls.push({name, fn, options});
   }
 }
+const delay = (millis, val) => {
+  return new Promise((resolve, reject) => {
+	setTimeout(() => {
+	  resolve(val);
+	}, millis);
+  });
+};
 
 describe('benchmark-commits: Run benchmark on specified git commits', () => {
   describe('specDesc(spec)', () => {
@@ -98,21 +105,22 @@ describe('benchmark-commits: Run benchmark on specified git commits', () => {
   });
 
   describe('SuiteSetup#run(specs, register)', () => {
+    const specs = [
+      {
+        name: 'Regex#test',
+        git: 'bench-test-1'
+      },
+      {
+        name: 'String#indexOf',
+        git: 'bench-test-2'
+      },
+      {
+        name: 'String#match',
+        git: 'bench-test-3'
+      }
+    ];
+
     it('add benchmark for each experiment', (done) => {
-      const specs = [
-        {
-          name: 'Regex#test',
-          git: 'bench-test-1'
-        },
-        {
-          name: 'String#indexOf',
-          git: 'bench-test-2'
-        },
-        {
-          name: 'String#match',
-          git: 'bench-test-3'
-        }
-      ];
       const calls = [];
       const suite = new FakeBenchmarkSuite(calls);
       const setup = new SuiteSetup(suite, targetDir);
@@ -126,6 +134,21 @@ describe('benchmark-commits: Run benchmark on specified git commits', () => {
         done();
       });
     });
-  });
 
+    it('register benchmark asynchronously (e.g. dynamic import)', (done) => {
+      const calls = [];
+      const suite = new FakeBenchmarkSuite(calls);
+      const setup = new SuiteSetup(suite, targetDir);
+      setup.run(specs, ({ suite, spec, dir }) => {
+        const prod = require(`${dir}/test/fixtures/prod`);
+        const fn = () => {
+          prod('Hello World!');
+        };
+        return delay(100, fn);
+      }).then((suite) => {
+        assert(calls.length === 3);
+        done();
+      });
+    });
+  });
 });
