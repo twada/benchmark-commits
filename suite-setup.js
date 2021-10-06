@@ -6,6 +6,10 @@ const { spawn } = require('child_process');
 const { extract } = require('extract-git-treeish');
 const zf = (n, len = 2) => String(n).padStart(len, '0');
 const ymd = (d = new Date()) => `${d.getFullYear()}${zf(d.getMonth() + 1)}${zf(d.getDate())}${zf(d.getHours())}${zf(d.getMinutes())}${zf(d.getSeconds())}${zf(d.getMilliseconds(), 3)}`;
+const isPromiseLike = (o) => o !== null &&
+      typeof o === 'object' &&
+      typeof o.then === 'function' &&
+      typeof o.catch === 'function';
 
 class SuiteSetup extends EventEmitter {
   constructor(suite, workDir) {
@@ -34,15 +38,28 @@ class SuiteSetup extends EventEmitter {
         }).catch(reject);
       });
     });
-    return Promise.all(tasks).then(results => {
-      for (const { spec, dir } of results) {
+    const registrations = tasks.map((task) => {
+      return task.then(({spec, dir}) => {
+        const doRegister = (result) => {
+          if (typeof result === 'function') {
+            suite.add(specDesc(spec), result);
+          }
+          return {spec, dir};
+        };
         setup.emit('register', spec, dir);
+
         const fn = register({ suite, spec, dir });
-        if (typeof fn === 'function') {
-          // suite.add(`${spec.name}(${spec.git})`, fn, howToDesignOptions);
-          suite.add(specDesc(spec), fn);
+
+        if (isPromiseLike(fn)) {
+          return fn.then((realFn) => {
+            return doRegister(realFn);
+          });
+        } else {
+          return doRegister(fn);
         }
-      }
+      });
+    });
+    return Promise.all(registrations).then(results => {
       setup.emit('finish', specs);
       return suite;
     });

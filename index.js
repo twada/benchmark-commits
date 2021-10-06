@@ -1,7 +1,7 @@
 'use strict';
 
 const { join } = require('path');
-const { rmdirSync } = require('fs');
+const fs = require('fs');
 const Benchmark = require('benchmark');
 const { SuiteSetup, commitsToSpecs, specDesc, ymd } = require('./suite-setup');
 
@@ -26,6 +26,12 @@ function runBenchmark (commits, register) {
   return new Promise((resolve, reject) => {
     const specs = commitsToSpecs(commits);
     setup.run(specs, register).then((suite) => {
+      suite.on('abort', function () {
+        console.error(arguments);
+      });
+      suite.on('error', function (event) {
+        console.error(event.target.error);
+      });
       suite.on('start', function () {
         console.log(`start suite of ${specs.length} benchmarks`);
       });
@@ -34,7 +40,7 @@ function runBenchmark (commits, register) {
       });
       suite.on('complete', function () {
         console.log(`finish suite: fastest is [${this.filter('fastest').map('name')}]`);
-        rmdirSync(destDir, { recursive: true });
+        (fs.rmSync || fs.rmdirSync)(destDir, { recursive: true, force: true });
         resolve(suite);
       });
       suite.run({ async: true });
