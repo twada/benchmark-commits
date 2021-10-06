@@ -21,6 +21,13 @@ const delay = (millis, val) => {
 	}, millis);
   });
 };
+const rejectLater = (millis, err) => {
+  return new Promise((resolve, reject) => {
+	setTimeout(() => {
+	  reject(err);
+	}, millis);
+  });
+};
 
 describe('benchmark-commits: Run benchmark on specified git commits', () => {
   describe('specDesc(spec)', () => {
@@ -154,6 +161,59 @@ describe('benchmark-commits: Run benchmark on specified git commits', () => {
         assert(skipCalls.length === 2);
         assert.deepEqual(skipCalls[0].spec, { name: 'error1', git: 'nonexistent1' });
         assert.deepEqual(skipCalls[1].spec, { name: 'error2', git: 'nonexistent2' });
+        done();
+      });
+    });
+
+    it('skip benchmark registration if error occurred in registration function', (done) => {
+      const skipCalls = [];
+      setup.on('skip', (spec, reason) => {
+        console.error(spec);
+        console.error(reason);
+        skipCalls.push({spec, reason});
+      });
+      setup.run(specs, ({ suite, spec, dir }) => {
+        if (spec.git === 'bench-test-2') {
+          throw new Error('Some Error');
+        }
+        const prod = require(`${dir}/test/fixtures/prod`);
+        return () => {
+          prod('Hello World!');
+        };
+      }).then((suite) => {
+        assert(addCalls.length === 2);
+        assert(skipCalls.length === 1);
+        assert.deepEqual(skipCalls[0].spec, {
+          name: 'String#indexOf',
+          git: 'bench-test-2'
+        });
+        done();
+      });
+    });
+
+    it('skip benchmark registration if async registration function rejects', (done) => {
+      const skipCalls = [];
+      setup.on('skip', (spec, reason) => {
+        console.error(spec);
+        console.error(reason);
+        skipCalls.push({spec, reason});
+      });
+      setup.run(specs, ({ suite, spec, dir }) => {
+        const prod = require(`${dir}/test/fixtures/prod`);
+        const fn = () => {
+          prod('Hello World!');
+        };
+        if (spec.git === 'bench-test-2') {
+          return rejectLater(100, new Error('Rejection'));
+        }
+        return delay(100, fn);
+      }).then((suite) => {
+        assert(addCalls.length === 2);
+        assert(skipCalls.length === 1);
+        assert.deepEqual(skipCalls[0].spec, {
+          name: 'String#indexOf',
+          git: 'bench-test-2'
+        });
         done();
       });
     });
