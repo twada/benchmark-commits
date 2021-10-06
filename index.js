@@ -1,7 +1,7 @@
 'use strict';
 
 const { join } = require('path');
-const { rmdirSync } = require('fs');
+const fs = require('fs');
 const Benchmark = require('benchmark');
 const { SuiteSetup, commitsToSpecs, specDesc, ymd } = require('./suite-setup');
 
@@ -40,7 +40,7 @@ function runBenchmark (commits, register) {
       });
       suite.on('complete', function () {
         console.log(`finish suite: fastest is [${this.filter('fastest').map('name')}]`);
-        rmdirSync(destDir, { recursive: true });
+        (fs.rmSync || fs.rmdirSync)(destDir, { recursive: true, force: true });
         resolve(suite);
       });
       suite.run({ async: true });

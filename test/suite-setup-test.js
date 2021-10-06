@@ -100,7 +100,7 @@ describe('benchmark-commits: Run benchmark on specified git commits', () => {
   });
   afterEach(() => {
     if (fs.existsSync(targetDir)) {
-      fs.rmdirSync(targetDir, { recursive: true });
+      (fs.rmSync || fs.rmdirSync)(targetDir, { recursive: true, force: true });
     }
   });
 
