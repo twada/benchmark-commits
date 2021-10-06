@@ -120,6 +120,39 @@ describe('benchmark-commits: Run benchmark on specified git commits', () => {
       }
     ];
 
+    it('skip benchmark registration if tree-ish does not exist', (done) => {
+      const calls = [];
+      const suite = new FakeBenchmarkSuite(calls);
+      const setup = new SuiteSetup(suite, targetDir);
+      const specsIncldingError = [
+        {
+          name: 'error1',
+          git: 'nonexistent1'
+        },
+        ...specs,
+        {
+          name: 'error2',
+          git: 'nonexistent2'
+        }
+      ];
+      const skipCalls = [];
+      setup.on('skip', (spec, reason) => {
+        skipCalls.push({spec, reason});
+      });
+      setup.run(specsIncldingError, ({ suite, spec, dir }) => {
+        const prod = require(`${dir}/test/fixtures/prod`);
+        return () => {
+          prod('Hello World!');
+        };
+      }).then((suite) => {
+        assert(calls.length === 3);
+        assert(skipCalls.length === 2);
+        assert.deepEqual(skipCalls[0].spec, { name: 'error1', git: 'nonexistent1' });
+        assert.deepEqual(skipCalls[1].spec, { name: 'error2', git: 'nonexistent2' });
+        done();
+      });
+    });
+
     it('add benchmark for each experiment', (done) => {
       const calls = [];
       const suite = new FakeBenchmarkSuite(calls);

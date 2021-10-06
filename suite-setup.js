@@ -59,8 +59,14 @@ class SuiteSetup extends EventEmitter {
         }
       });
     });
-    return Promise.all(registrations).then(results => {
-      setup.emit('finish', specs);
+    return Promise.allSettled(registrations).then(results => {
+      specs.forEach((spec, i) => {
+        const result = results[i];
+        if (result.status === 'rejected') {
+          setup.emit('skip', spec, result.reason);
+        }
+      });
+      setup.emit('finish', suite);
       return suite;
     });
   }

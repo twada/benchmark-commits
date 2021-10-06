@@ -13,6 +13,10 @@ describe('benchmark-commits: Run benchmark on specified git commits', () => {
       git: 'bench-test-2'
     },
     {
+      name: 'to-be-skipped',
+      git: 'nonexistent1'
+    },
+    {
       name: 'String#match',
       git: 'bench-test-3'
     }

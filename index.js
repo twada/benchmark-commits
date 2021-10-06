@@ -11,8 +11,8 @@ function runBenchmark (commits, register) {
   setup.on('start', (specs) => {
     console.log(`start preparation of ${specs.length} benchmarks`);
   });
-  setup.on('finish', (specs) => {
-    console.log(`finish preparation of ${specs.length} benchmarks`);
+  setup.on('finish', (suite) => {
+    console.log(`finish preparation of ${suite.length} benchmarks`);
   });
   setup.on('npm:install:start', (spec, dir) => {
     console.log(`start npm install of ${specDesc(spec)}`);
@@ -22,6 +22,9 @@ function runBenchmark (commits, register) {
   });
   setup.on('register', (spec, dir) => {
     console.log(`register benchmark of ${specDesc(spec)}`);
+  });
+  setup.on('skip', (spec, reason) => {
+    console.log(`skip benchmark of ${specDesc(spec)}, reason: [${reason}]`);
   });
   return new Promise((resolve, reject) => {
     const specs = commitsToSpecs(commits);
@@ -33,7 +36,7 @@ function runBenchmark (commits, register) {
         console.error(event.target.error);
       });
       suite.on('start', function () {
-        console.log(`start suite of ${specs.length} benchmarks`);
+        console.log(`start suite of ${suite.length} benchmarks`);
       });
       suite.on('cycle', function (event) {
         console.log(`finish benchmark of ${event.target}`);
