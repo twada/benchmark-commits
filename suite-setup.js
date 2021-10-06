@@ -22,7 +22,8 @@ class SuiteSetup extends EventEmitter {
     const destDir = this.workDir;
     const suite = this.suite;
     setup.emit('start', specs);
-    const tasks = specs.map((spec) => {
+
+    const installations = specs.map((spec) => {
       return new Promise((resolve, reject) => {
         extract({ treeIsh: spec.git, dest: join(destDir, spec.name) }).then(({ dir }) => {
           setup.emit('npm:install:start', spec, dir);
@@ -38,27 +39,27 @@ class SuiteSetup extends EventEmitter {
         }).catch(reject);
       });
     });
-    const registrations = tasks.map((task) => {
-      return task.then(({spec, dir}) => {
-        const doRegister = (result) => {
-          if (typeof result === 'function') {
-            suite.add(specDesc(spec), result);
+
+    const registrations = installations.map((installation) => {
+      return installation.then(({spec, dir}) => {
+        const addToSuite = (fn) => {
+          if (typeof fn === 'function') {
+            suite.add(specDesc(spec), fn);
           }
           return {spec, dir};
         };
         setup.emit('register', spec, dir);
-
+        // rejects benchmark registration Promise on error
         const fn = register({ suite, spec, dir });
-
         if (isPromiseLike(fn)) {
-          return fn.then((realFn) => {
-            return doRegister(realFn);
-          });
+          // rejects benchmark registration Promise if fn rejects
+          return fn.then((resolved) => addToSuite(resolved));
         } else {
-          return doRegister(fn);
+          return addToSuite(fn);
         }
       });
     });
+
     return Promise.allSettled(registrations).then(results => {
       specs.forEach((spec, i) => {
         const result = results[i];
