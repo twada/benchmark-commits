@@ -168,8 +168,6 @@ describe('benchmark-commits: Run benchmark on specified git commits', () => {
     it('skip benchmark registration if error occurred in registration function', (done) => {
       const skipCalls = [];
       setup.on('skip', (spec, reason) => {
-        console.error(spec);
-        console.error(reason);
         skipCalls.push({spec, reason});
       });
       setup.run(specs, ({ suite, spec, dir }) => {
@@ -194,8 +192,6 @@ describe('benchmark-commits: Run benchmark on specified git commits', () => {
     it('skip benchmark registration if async registration function rejects', (done) => {
       const skipCalls = [];
       setup.on('skip', (spec, reason) => {
-        console.error(spec);
-        console.error(reason);
         skipCalls.push({spec, reason});
       });
       setup.run(specs, ({ suite, spec, dir }) => {
@@ -207,6 +203,30 @@ describe('benchmark-commits: Run benchmark on specified git commits', () => {
           return rejectLater(100, new Error('Rejection'));
         }
         return delay(100, fn);
+      }).then((suite) => {
+        assert(addCalls.length === 2);
+        assert(skipCalls.length === 1);
+        assert.deepEqual(skipCalls[0].spec, {
+          name: 'String#indexOf',
+          git: 'bench-test-2'
+        });
+        done();
+      });
+    });
+
+    it('skip benchmark registration if benchmark registration function does not return function', (done) => {
+      const skipCalls = [];
+      setup.on('skip', (spec, reason) => {
+        skipCalls.push({spec, reason});
+      });
+      setup.run(specs, ({ suite, spec, dir }) => {
+        if (spec.git === 'bench-test-2') {
+          return 'not a function';
+        }
+        const prod = require(`${dir}/test/fixtures/prod`);
+        return () => {
+          prod('Hello World!');
+        };
       }).then((suite) => {
         assert(addCalls.length === 2);
         assert(skipCalls.length === 1);

@@ -46,7 +46,11 @@ class SuiteSetup extends EventEmitter {
         const result = results[i];
         if (result.status === 'fulfilled') {
           const fn = result.value;
-          suite.add(specDesc(spec), fn);
+          if (typeof fn === 'function') {
+            suite.add(specDesc(spec), fn);
+          } else {
+            setup.emit('skip', spec, new TypeError('Benchmark registration function should return function'));
+          }
         } else if (result.status === 'rejected') {
           setup.emit('skip', spec, result.reason);
         }
