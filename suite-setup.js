@@ -8,12 +8,13 @@ const zf = (n, len = 2) => String(n).padStart(len, '0');
 const ymd = (d = new Date()) => `${d.getFullYear()}${zf(d.getMonth() + 1)}${zf(d.getDate())}${zf(d.getHours())}${zf(d.getMinutes())}${zf(d.getSeconds())}${zf(d.getMilliseconds(), 3)}`;
 
 class SuiteSetup extends EventEmitter {
-  constructor(suite, workDir) {
+  constructor (suite, workDir) {
     super();
     this.suite = suite;
     this.workDir = workDir;
   }
-  run(specs, register) {
+
+  run (specs, register) {
     const setup = this;
     const destDir = this.workDir;
     const suite = this.suite;
@@ -27,15 +28,15 @@ class SuiteSetup extends EventEmitter {
             cwd: dir
           };
           spawn('npm', ['install'], spawnOptions)
-              .on('error', reject)
-              .on('close', (code, signal) => {
-                setup.emit('npm:install:finish', spec, dir);
-                resolve({ spec, dir });
-              });
+            .on('error', reject)
+            .on('close', (code, signal) => {
+              setup.emit('npm:install:finish', spec, dir);
+              resolve({ spec, dir });
+            });
         }).catch(reject);
       });
     }).map((installation) => {
-      return installation.then(({spec, dir}) => {
+      return installation.then(({ spec, dir }) => {
         setup.emit('register', spec, dir);
         return register({ suite, spec, dir });
       });
@@ -65,7 +66,7 @@ class SuiteSetup extends EventEmitter {
   }
 }
 
-function commitsToSpecs(commits) {
+function commitsToSpecs (commits) {
   return commits.map((commit) => {
     if (typeof commit === 'string') {
       return {
@@ -78,7 +79,7 @@ function commitsToSpecs(commits) {
   });
 }
 
-function specDesc(spec) {
+function specDesc (spec) {
   if (spec.name !== spec.git) {
     return `${spec.name}(${spec.git})`;
   } else {
