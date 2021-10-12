@@ -26,7 +26,10 @@
   "scripts": {
     "lint": "semistandard --verbose index.js suite-setup.js test/*test.js | snazzy",
     "fmt": "semistandard --fix index.js suite-setup.js test/*test.js",
-    "test": "mocha --timeout 0"
+    "test": "npm run lint && npm run test:all",
+    "test:unit": "mocha --timeout 0 test/suite-setup-test.js",
+    "test:doc": "mocha --timeout 0 --reporter @twada/mocha-spec-tree-reporter test",
+    "test:all": "mocha --timeout 0 test"
   },
   "semistandard": {
     "globals": [
