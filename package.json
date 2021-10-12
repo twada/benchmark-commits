@@ -18,9 +18,23 @@
     "extract-git-treeish": "^1.0.0"
   },
   "devDependencies": {
-    "mocha": "^8.0.0"
+    "@twada/mocha-spec-tree-reporter": "^0.2.0",
+    "mocha": "^9.0.0",
+    "semistandard": "^16.0.0",
+    "snazzy": "^9.0.0"
   },
   "scripts": {
+    "lint": "semistandard --verbose index.js suite-setup.js test/*test.js | snazzy",
+    "fmt": "semistandard --fix index.js suite-setup.js test/*test.js",
     "test": "mocha --timeout 0"
+  },
+  "semistandard": {
+    "globals": [
+      "describe",
+      "context",
+      "beforeEach",
+      "afterEach",
+      "it"
+    ]
   }
 }
