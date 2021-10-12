@@ -42,12 +42,20 @@ function runBenchmark (commits, register) {
         console.log(`finish benchmark of ${event.target}`);
       });
       suite.on('complete', function () {
-        console.log(`finish suite: fastest is [${this.filter('fastest').map('name')}]`);
-        (fs.rmSync || fs.rmdirSync)(destDir, { recursive: true, force: true });
-        resolve(suite);
+        try {
+          const successful = this.filter('successful');
+          if (successful.length === 0) {
+            reject(new Error('All benchmarks failed'));
+          } else {
+            console.log(`finish suite: fastest is [${this.filter('fastest').map('name')}]`);
+            resolve(suite);
+          }
+        } finally {
+          (fs.rmSync || fs.rmdirSync)(destDir, { recursive: true, force: true });
+        }
       });
       suite.run({ async: true });
-    });
+    }).catch((err) => reject(err));
   });
 }
 
