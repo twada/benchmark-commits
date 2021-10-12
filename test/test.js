@@ -48,7 +48,7 @@ describe('runBenchmark rejects if all benchmark executions have failed', () => {
   ];
   it('runBenchmark(specs, register) with failure', (done) => {
     runBenchmark(specs, ({ suite, spec, dir }) => {
-      const prod = require(`${dir}/test/fixtures/prod`);
+      require(`${dir}/test/fixtures/prod`);
       return () => {
         throw new Error(`execution error ${spec.git}`);
       };
