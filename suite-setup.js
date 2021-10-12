@@ -55,8 +55,12 @@ class SuiteSetup extends EventEmitter {
           setup.emit('skip', spec, result.reason);
         }
       });
-      setup.emit('finish', suite);
-      return suite;
+      if (suite.length === 0) {
+        throw new Error('All benchmark registrations failed');
+      } else {
+        setup.emit('finish', suite);
+        return suite;
+      }
     });
   }
 }

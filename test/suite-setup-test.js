@@ -13,6 +13,9 @@ class FakeBenchmarkSuite extends EventEmitter {
   add(name, fn, options) {
     this.calls.push({name, fn, options});
   }
+  get length() {
+    return this.calls.length;
+  }
 }
 const delay = (millis, val) => {
   return new Promise((resolve, reject) => {
@@ -27,6 +30,11 @@ const rejectLater = (millis, err) => {
 	  reject(err);
 	}, millis);
   });
+};
+const shouldNotBeFulfilled = (done) => {
+  return (args) => {
+    done(new Error('should not be fulfilled'));
+  };
 };
 
 describe('benchmark-commits: Run benchmark on specified git commits', () => {
@@ -234,6 +242,21 @@ describe('benchmark-commits: Run benchmark on specified git commits', () => {
           name: 'String#indexOf',
           git: 'bench-test-2'
         });
+        done();
+      });
+    });
+
+    it('rejects if all benchmark registration failed', (done) => {
+      const skipCalls = [];
+      setup.on('skip', (spec, reason) => {
+        skipCalls.push({spec, reason});
+      });
+      setup.run(specs, ({ suite, spec, dir }) => {
+        throw new Error('registration error');
+      }).then(shouldNotBeFulfilled(done), (err) => {
+        assert(addCalls.length === 0);
+        assert(skipCalls.length === 3);
+        assert(err.message === 'All benchmark registrations failed');
         done();
       });
     });
