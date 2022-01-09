@@ -48,7 +48,7 @@ class SuiteSetup extends EventEmitter {
         if (result.status === 'fulfilled') {
           const fn = result.value;
           if (typeof fn === 'function') {
-            suite.add(specDesc(spec), fn);
+            suite.add(benchmarkName(spec), fn);
           } else {
             setup.emit('skip', spec, new TypeError('Benchmark registration function should return function'));
           }
@@ -79,7 +79,7 @@ function commitsToSpecs (commits) {
   });
 }
 
-function specDesc (spec) {
+function benchmarkName (spec) {
   if (spec.name !== spec.git) {
     return `${spec.name}(${spec.git})`;
   } else {
@@ -90,6 +90,6 @@ function specDesc (spec) {
 module.exports = {
   SuiteSetup,
   commitsToSpecs,
-  specDesc,
+  benchmarkName,
   ymd
 };
