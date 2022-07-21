@@ -5,7 +5,7 @@ const fs = require('fs');
 const Benchmark = require('benchmark');
 const { setupSuite, commitsToSpecs, benchmarkName } = require('./suite-setup');
 const zf = (n, len = 2) => String(n).padStart(len, '0');
-const ymd = (d = new Date()) => `${d.getFullYear()}${zf(d.getMonth() + 1)}${zf(d.getDate())}${zf(d.getHours())}${zf(d.getMinutes())}${zf(d.getSeconds())}${zf(d.getMilliseconds(), 3)}`;
+const timestampString = (d = new Date()) => `${d.getFullYear()}${zf(d.getMonth() + 1)}${zf(d.getDate())}${zf(d.getHours())}${zf(d.getMinutes())}${zf(d.getSeconds())}${zf(d.getMilliseconds(), 3)}`;
 
 class ConsoleLogger {
   log (str) {
@@ -22,7 +22,7 @@ function runBenchmark (commits, register, options) {
     logger: new ConsoleLogger()
   }, options);
   const logger = options.logger;
-  const destDir = join(process.cwd(), ymd());
+  const destDir = join(process.cwd(), timestampString());
   const setup = setupSuite(new Benchmark.Suite('benchmark-commits'), destDir);
   setup.on('start', (specs) => {
     logger.log(`start preparation of ${specs.length} benchmarks`);

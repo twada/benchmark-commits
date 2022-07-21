@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const assert = require('assert').strict;
 const zf = (n, len = 2) => String(n).padStart(len, '0');
-const ymd = (d = new Date()) => `${d.getFullYear()}${zf(d.getMonth() + 1)}${zf(d.getDate())}${zf(d.getHours())}${zf(d.getMinutes())}${zf(d.getSeconds())}${zf(d.getMilliseconds(), 3)}`;
+const timestampString = (d = new Date()) => `${d.getFullYear()}${zf(d.getMonth() + 1)}${zf(d.getDate())}${zf(d.getHours())}${zf(d.getMinutes())}${zf(d.getSeconds())}${zf(d.getMilliseconds(), 3)}`;
 const EventEmitter = require('events');
 class FakeBenchmarkSuite extends EventEmitter {
   constructor (calls) {
@@ -104,7 +104,7 @@ describe('runBenchmark(specs, register): run benchmark for given `specs`. Each b
       ];
       addCalls = [];
       const suite = new FakeBenchmarkSuite(addCalls);
-      targetDir = path.join(os.tmpdir(), ymd());
+      targetDir = path.join(os.tmpdir(), timestampString());
       setup = setupSuite(suite, targetDir);
     });
 
