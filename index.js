@@ -3,7 +3,7 @@
 const { join } = require('path');
 const fs = require('fs');
 const Benchmark = require('benchmark');
-const { SuiteSetup, commitsToSpecs, benchmarkName, ymd } = require('./suite-setup');
+const { setupSuite, commitsToSpecs, benchmarkName, ymd } = require('./suite-setup');
 
 class ConsoleLogger {
   log (str) {
@@ -21,7 +21,7 @@ function runBenchmark (commits, register, options) {
   }, options);
   const logger = options.logger;
   const destDir = join(process.cwd(), ymd());
-  const setup = new SuiteSetup(new Benchmark.Suite('benchmark-commits'), destDir);
+  const setup = setupSuite(new Benchmark.Suite('benchmark-commits'), destDir);
   setup.on('start', (specs) => {
     logger.log(`start preparation of ${specs.length} benchmarks`);
   });

@@ -87,8 +87,12 @@ function benchmarkName (spec) {
   }
 }
 
+function setupSuite (suite, workDir) {
+  return new SuiteSetup(suite, workDir);
+}
+
 module.exports = {
-  SuiteSetup,
+  setupSuite,
   commitsToSpecs,
   benchmarkName,
   ymd

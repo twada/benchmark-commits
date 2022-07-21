@@ -1,5 +1,5 @@
 delete require.cache[require.resolve('../suite-setup')];
-const { SuiteSetup, commitsToSpecs, benchmarkName, ymd } = require('../suite-setup');
+const { setupSuite, commitsToSpecs, benchmarkName, ymd } = require('../suite-setup');
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
@@ -103,7 +103,7 @@ describe('runBenchmark(specs, register): run benchmark for given `specs`. Each b
       addCalls = [];
       const suite = new FakeBenchmarkSuite(addCalls);
       targetDir = path.join(os.tmpdir(), ymd());
-      setup = new SuiteSetup(suite, targetDir);
+      setup = setupSuite(suite, targetDir);
     });
 
     afterEach(() => {
