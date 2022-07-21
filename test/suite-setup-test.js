@@ -1,9 +1,11 @@
 delete require.cache[require.resolve('../suite-setup')];
-const { setupSuite, commitsToSpecs, benchmarkName, ymd } = require('../suite-setup');
+const { setupSuite, commitsToSpecs, benchmarkName } = require('../suite-setup');
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
 const assert = require('assert').strict;
+const zf = (n, len = 2) => String(n).padStart(len, '0');
+const ymd = (d = new Date()) => `${d.getFullYear()}${zf(d.getMonth() + 1)}${zf(d.getDate())}${zf(d.getHours())}${zf(d.getMinutes())}${zf(d.getSeconds())}${zf(d.getMilliseconds(), 3)}`;
 const EventEmitter = require('events');
 class FakeBenchmarkSuite extends EventEmitter {
   constructor (calls) {

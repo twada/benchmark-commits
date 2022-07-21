@@ -4,8 +4,6 @@ const EventEmitter = require('events');
 const { join } = require('path');
 const { spawn } = require('child_process');
 const { extract } = require('extract-git-treeish');
-const zf = (n, len = 2) => String(n).padStart(len, '0');
-const ymd = (d = new Date()) => `${d.getFullYear()}${zf(d.getMonth() + 1)}${zf(d.getDate())}${zf(d.getHours())}${zf(d.getMinutes())}${zf(d.getSeconds())}${zf(d.getMilliseconds(), 3)}`;
 
 class SuiteSetup extends EventEmitter {
   constructor (suite, workDir) {
@@ -94,6 +92,5 @@ function setupSuite (suite, workDir) {
 module.exports = {
   setupSuite,
   commitsToSpecs,
-  benchmarkName,
-  ymd
+  benchmarkName
 };
