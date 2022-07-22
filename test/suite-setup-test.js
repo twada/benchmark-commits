@@ -1,5 +1,5 @@
 delete require.cache[require.resolve('../suite-setup')];
-const { setupSuite, commitsToSpecs, benchmarkName } = require('../suite-setup');
+const { setupSuite, normalizeSpecs, benchmarkName } = require('../suite-setup');
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
@@ -39,17 +39,17 @@ const shouldNotBeFulfilled = () => {
   assert(false, 'should not be fulfilled');
 };
 
-describe('runBenchmark(specs, register): run benchmark for given `specs`. Each benchmark function is registered via `register` function', () => {
-  describe('`specs` is an array of either (1) string specifying git tag/branch/commit or (2) object having `name` and `git` properties, pointing to git object to be checked out for the benchmark', () => {
-    describe('internally, each item in `specs` is normalized to `spec` object in {name, git} form', () => {
-      describe('if `specs` is an array of string specifying git tag/branch/commit', () => {
+describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commitsOrSpecs`. Each benchmark function is registered via `register` function', () => {
+  describe('`commitsOrSpecs` is an array of either (1) string specifying git tag/branch/commit or (2) object having `name` and `git` properties, pointing to git object to be checked out for the benchmark', () => {
+    describe('internally, each item in `commitsOrSpecs` is normalized to `spec` object in {name, git} form', () => {
+      describe('if `commitsOrSpecs` is an array of string specifying git tag/branch/commit', () => {
         it('converts each string to {name, git} form. name === git in this case.', () => {
           const commits = [
             'bench-test-1',
             'bench-test-2',
             'bench-test-3'
           ];
-          assert.deepEqual(commitsToSpecs(commits), [
+          assert.deepEqual(normalizeSpecs(commits), [
             { name: 'bench-test-1', git: 'bench-test-1' },
             { name: 'bench-test-2', git: 'bench-test-2' },
             { name: 'bench-test-3', git: 'bench-test-3' }
@@ -60,14 +60,14 @@ describe('runBenchmark(specs, register): run benchmark for given `specs`. Each b
           assert(benchmarkName(spec) === 'bench-test-1');
         });
       });
-      describe('if `specs` is already an array of `spec` object having {name, git} form', () => {
+      describe('if `commitsOrSpecs` is already an array of `spec` object having {name, git} form', () => {
         it('use them as `spec` object', () => {
           const commits = [
             { name: 'Regex#test', git: 'bench-test-1' },
             { name: 'String#indexOf', git: 'bench-test-2' },
             { name: 'String#match', git: 'bench-test-3' }
           ];
-          assert.deepEqual(commitsToSpecs(commits), [
+          assert.deepEqual(normalizeSpecs(commits), [
             { name: 'Regex#test', git: 'bench-test-1' },
             { name: 'String#indexOf', git: 'bench-test-2' },
             { name: 'String#match', git: 'bench-test-3' }
@@ -137,7 +137,7 @@ describe('runBenchmark(specs, register): run benchmark for given `specs`. Each b
       });
     });
 
-    it('if git commit object in `specs` does not exist in underlying git repository, skip benchmark registration for that `spec`', () => {
+    it('if git commit object in `commitsOrSpecs` does not exist in underlying git repository, skip benchmark registration for that `spec`', () => {
       const specsIncldingError = [
         {
           name: 'error1',

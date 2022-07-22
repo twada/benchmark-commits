@@ -3,7 +3,7 @@
 const { join } = require('path');
 const fs = require('fs');
 const Benchmark = require('benchmark');
-const { setupSuite, commitsToSpecs, benchmarkName } = require('./suite-setup');
+const { setupSuite, normalizeSpecs, benchmarkName } = require('./suite-setup');
 const zf = (n, len = 2) => String(n).padStart(len, '0');
 const timestampString = (d = new Date()) => `${d.getFullYear()}${zf(d.getMonth() + 1)}${zf(d.getDate())}${zf(d.getHours())}${zf(d.getMinutes())}${zf(d.getSeconds())}${zf(d.getMilliseconds(), 3)}`;
 
@@ -17,7 +17,7 @@ class ConsoleLogger {
   }
 }
 
-function runBenchmark (commits, register, options) {
+function runBenchmark (commitsOrSpecs, register, options) {
   options = Object.assign({
     logger: new ConsoleLogger()
   }, options);
@@ -43,7 +43,7 @@ function runBenchmark (commits, register, options) {
     logger.log(`skip benchmark of ${benchmarkName(spec)}, reason: [${reason}]`);
   });
   return new Promise((resolve, reject) => {
-    const specs = commitsToSpecs(commits);
+    const specs = normalizeSpecs(commitsOrSpecs);
     setup.run(specs, register).then((suite) => {
       suite.on('abort', function () {
         logger.error(arguments);

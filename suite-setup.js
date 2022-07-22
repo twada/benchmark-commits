@@ -64,7 +64,7 @@ class SuiteSetup extends EventEmitter {
   }
 }
 
-function commitsToSpecs (commits) {
+function normalizeSpecs (commits) {
   return commits.map((commit) => {
     if (typeof commit === 'string') {
       return {
@@ -91,6 +91,6 @@ function setupSuite (suite, workDir) {
 
 module.exports = {
   setupSuite,
-  commitsToSpecs,
+  normalizeSpecs,
   benchmarkName
 };

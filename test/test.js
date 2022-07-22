@@ -27,7 +27,7 @@ const take = (ary, len) => {
   return ary.splice(0, len);
 };
 
-describe('runBenchmark(specs, register): run benchmark for given `specs`. Each benchmark function is registered via `register` function', () => {
+describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commitsOrSpecs`. Each benchmark function is registered via `register` function', () => {
   it('if all benchmark executions have finished (at least one benchmark was successful), output benchmark result then resolve with benchmark suite', () => {
     const specs = [
       {
