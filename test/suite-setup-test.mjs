@@ -1,6 +1,6 @@
 import { setupSuite, normalizeSpecs, benchmarkName } from '../src/suite-setup.mjs';
 import { tmpdir } from 'os';
-import fs from 'fs';
+import { existsSync, rmSync } from 'fs';
 import { join } from 'path';
 import { strict as assert } from 'assert';
 import { EventEmitter } from 'events';
@@ -111,8 +111,8 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
     });
 
     afterEach(() => {
-      if (fs.existsSync(targetDir)) {
-        (fs.rmSync || fs.rmdirSync)(targetDir, { recursive: true, force: true });
+      if (existsSync(targetDir)) {
+        rmSync(targetDir, { recursive: true, force: true });
       }
     });
 

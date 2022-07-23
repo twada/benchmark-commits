@@ -1,5 +1,5 @@
 import { join } from 'path';
-import fs from 'fs';
+import { rmSync } from 'fs';
 import Benchmark from 'benchmark';
 import { setupSuite, normalizeSpecs, benchmarkName } from './suite-setup.mjs';
 
@@ -71,7 +71,7 @@ function runBenchmark (commitsOrSpecs, register, options) {
             resolve(suite);
           }
         } finally {
-          (fs.rmSync || fs.rmdirSync)(destDir, { recursive: true, force: true });
+          rmSync(destDir, { recursive: true, force: true });
         }
       });
       suite.run({ async: true });
