@@ -1,6 +1,7 @@
-delete require.cache[require.resolve('..')];
-const { runBenchmark } = require('..');
-const assert = require('assert').strict;
+import { runBenchmark } from '../src/index.mjs';
+import assert from 'assert/strict';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 const shouldNotBeFulfilled = () => {
   assert(false, 'should not be fulfilled');
 };

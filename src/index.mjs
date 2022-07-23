@@ -1,9 +1,8 @@
-'use strict';
+import { join } from 'path';
+import fs from 'fs';
+import Benchmark from 'benchmark';
+import { setupSuite, normalizeSpecs, benchmarkName } from './suite-setup.mjs';
 
-const { join } = require('path');
-const fs = require('fs');
-const Benchmark = require('benchmark');
-const { setupSuite, normalizeSpecs, benchmarkName } = require('./suite-setup');
 const zf = (n, len = 2) => String(n).padStart(len, '0');
 const timestampString = (d = new Date()) => `${d.getFullYear()}${zf(d.getMonth() + 1)}${zf(d.getDate())}${zf(d.getHours())}${zf(d.getMinutes())}${zf(d.getSeconds())}${zf(d.getMilliseconds(), 3)}`;
 
@@ -80,6 +79,6 @@ function runBenchmark (commitsOrSpecs, register, options) {
   });
 }
 
-module.exports = {
+export {
   runBenchmark
 };

@@ -1,9 +1,7 @@
-'use strict';
-
-const EventEmitter = require('events');
-const { join } = require('path');
-const { spawn } = require('child_process');
-const { extract } = require('extract-git-treeish');
+import { EventEmitter } from 'events';
+import { join } from 'path';
+import { spawn } from 'child_process';
+import { extract } from 'extract-git-treeish';
 
 class SuiteSetup extends EventEmitter {
   constructor (suite, workDir) {
@@ -89,7 +87,7 @@ function setupSuite (suite, workDir) {
   return new SuiteSetup(suite, workDir);
 }
 
-module.exports = {
+export {
   setupSuite,
   normalizeSpecs,
   benchmarkName
