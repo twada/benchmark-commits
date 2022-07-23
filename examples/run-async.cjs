@@ -1,4 +1,4 @@
-const { runBenchmark } = require('..');
+const { runBenchmark } = require('../dist/index.cjs');
 const specs = [
   {
     name: 'Regex#test',
@@ -13,13 +13,11 @@ const specs = [
     git: 'bench-test-3'
   }
 ];
-runBenchmark(specs, ({ suite, spec, dir }) => {
+runBenchmark(specs, async ({ suite, spec, dir }) => {
   const prod = require(`${dir}/test/fixtures/prod`);
   return () => {
     prod('Hello World!');
   };
 }).then((suite) => {
   console.log('FINISHED');
-}).catch((err) => {
-  console.log('ERROR');
 });
