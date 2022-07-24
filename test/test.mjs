@@ -1,5 +1,5 @@
 import { runBenchmark } from '../src/index.mjs';
-import assert from 'assert/strict';
+import {strict as assert} from 'assert';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const shouldNotBeFulfilled = () => {
