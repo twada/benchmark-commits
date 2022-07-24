@@ -7,7 +7,11 @@
     "email": "takuto.wada@gmail.com",
     "url": "https://github.com/twada"
   },
-  "main": "index.js",
+  "main": "./dist/index.cjs",
+  "exports": {
+    "import": "./src/index.mjs",
+    "require": "./dist/index.cjs"
+  },
   "publishConfig": {
     "access": "public"
   },
