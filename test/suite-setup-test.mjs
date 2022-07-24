@@ -1,12 +1,14 @@
-delete require.cache[require.resolve('../suite-setup')];
-const { setupSuite, normalizeSpecs, benchmarkName } = require('../suite-setup');
-const os = require('os');
-const fs = require('fs');
-const path = require('path');
-const assert = require('assert').strict;
+import { setupSuite, normalizeSpecs, benchmarkName } from '../src/suite-setup.mjs';
+import { tmpdir } from 'os';
+import { existsSync, rmSync } from 'fs';
+import { join } from 'path';
+import { strict as assert } from 'assert';
+import { EventEmitter } from 'events';
+// import { pathToFileURL } from 'node:url';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 const zf = (n, len = 2) => String(n).padStart(len, '0');
 const timestampString = (d = new Date()) => `${d.getFullYear()}${zf(d.getMonth() + 1)}${zf(d.getDate())}${zf(d.getHours())}${zf(d.getMinutes())}${zf(d.getSeconds())}${zf(d.getMilliseconds(), 3)}`;
-const EventEmitter = require('events');
 class FakeBenchmarkSuite extends EventEmitter {
   constructor (calls) {
     super();
@@ -104,13 +106,13 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
       ];
       addCalls = [];
       const suite = new FakeBenchmarkSuite(addCalls);
-      targetDir = path.join(os.tmpdir(), timestampString());
+      targetDir = join(tmpdir(), timestampString());
       setup = setupSuite(suite, targetDir);
     });
 
     afterEach(() => {
-      if (fs.existsSync(targetDir)) {
-        (fs.rmSync || fs.rmdirSync)(targetDir, { recursive: true, force: true });
+      if (existsSync(targetDir)) {
+        rmSync(targetDir, { recursive: true, force: true });
       }
     });
 

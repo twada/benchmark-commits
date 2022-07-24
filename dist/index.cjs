@@ -1,9 +1,10 @@
 'use strict';
 
-const { join } = require('path');
+const path = require('path');
 const fs = require('fs');
 const Benchmark = require('benchmark');
-const { setupSuite, normalizeSpecs, benchmarkName } = require('./suite-setup');
+const suiteSetup = require('./suite-setup.cjs');
+
 const zf = (n, len = 2) => String(n).padStart(len, '0');
 const timestampString = (d = new Date()) => `${d.getFullYear()}${zf(d.getMonth() + 1)}${zf(d.getDate())}${zf(d.getHours())}${zf(d.getMinutes())}${zf(d.getSeconds())}${zf(d.getMilliseconds(), 3)}`;
 
@@ -22,8 +23,8 @@ function runBenchmark (commitsOrSpecs, register, options) {
     logger: new ConsoleLogger()
   }, options);
   const logger = options.logger;
-  const destDir = join(process.cwd(), timestampString());
-  const setup = setupSuite(new Benchmark.Suite('benchmark-commits'), destDir);
+  const destDir = path.join(process.cwd(), timestampString());
+  const setup = suiteSetup.setupSuite(new Benchmark.Suite('benchmark-commits'), destDir);
   setup.on('start', (specs) => {
     logger.log(`start preparation of ${specs.length} benchmarks`);
   });
@@ -31,19 +32,19 @@ function runBenchmark (commitsOrSpecs, register, options) {
     logger.log(`finish preparation of ${suite.length} benchmarks`);
   });
   setup.on('npm:install:start', (spec, dir) => {
-    logger.log(`start npm install of ${benchmarkName(spec)}`);
+    logger.log(`start npm install of ${suiteSetup.benchmarkName(spec)}`);
   });
   setup.on('npm:install:finish', (spec, dir) => {
-    logger.log(`finish npm install of ${benchmarkName(spec)}`);
+    logger.log(`finish npm install of ${suiteSetup.benchmarkName(spec)}`);
   });
   setup.on('register', (spec, dir) => {
-    logger.log(`register benchmark of ${benchmarkName(spec)}`);
+    logger.log(`register benchmark of ${suiteSetup.benchmarkName(spec)}`);
   });
   setup.on('skip', (spec, reason) => {
-    logger.log(`skip benchmark of ${benchmarkName(spec)}, reason: [${reason}]`);
+    logger.log(`skip benchmark of ${suiteSetup.benchmarkName(spec)}, reason: [${reason}]`);
   });
   return new Promise((resolve, reject) => {
-    const specs = normalizeSpecs(commitsOrSpecs);
+    const specs = suiteSetup.normalizeSpecs(commitsOrSpecs);
     setup.run(specs, register).then((suite) => {
       suite.on('abort', function () {
         logger.error(arguments);
@@ -72,7 +73,7 @@ function runBenchmark (commitsOrSpecs, register, options) {
             resolve(suite);
           }
         } finally {
-          (fs.rmSync || fs.rmdirSync)(destDir, { recursive: true, force: true });
+          fs.rmSync(destDir, { recursive: true, force: true });
         }
       });
       suite.run({ async: true });
@@ -80,6 +81,4 @@ function runBenchmark (commitsOrSpecs, register, options) {
   });
 }
 
-module.exports = {
-  runBenchmark
-};
+exports.runBenchmark = runBenchmark;

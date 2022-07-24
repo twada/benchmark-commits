@@ -1,11 +1,11 @@
 'use strict';
 
-const EventEmitter = require('events');
-const { join } = require('path');
-const { spawn } = require('child_process');
-const { extract } = require('extract-git-treeish');
+const events = require('events');
+const path = require('path');
+const child_process = require('child_process');
+const extractGitTreeish = require('extract-git-treeish');
 
-class SuiteSetup extends EventEmitter {
+class SuiteSetup extends events.EventEmitter {
   constructor (suite, workDir) {
     super();
     this.suite = suite;
@@ -20,12 +20,12 @@ class SuiteSetup extends EventEmitter {
 
     const preparations = specs.map((spec) => {
       return new Promise((resolve, reject) => {
-        extract({ treeIsh: spec.git, dest: join(destDir, spec.name) }).then(({ dir }) => {
+        extractGitTreeish.extract({ treeIsh: spec.git, dest: path.join(destDir, spec.name) }).then(({ dir }) => {
           setup.emit('npm:install:start', spec, dir);
           const spawnOptions = {
             cwd: dir
           };
-          spawn('npm', ['install'], spawnOptions)
+          child_process.spawn('npm', ['install'], spawnOptions)
             .on('error', reject)
             .on('close', (code, signal) => {
               setup.emit('npm:install:finish', spec, dir);
@@ -89,8 +89,6 @@ function setupSuite (suite, workDir) {
   return new SuiteSetup(suite, workDir);
 }
 
-module.exports = {
-  setupSuite,
-  normalizeSpecs,
-  benchmarkName
-};
+exports.benchmarkName = benchmarkName;
+exports.normalizeSpecs = normalizeSpecs;
+exports.setupSuite = setupSuite;

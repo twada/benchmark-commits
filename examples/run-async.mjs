@@ -1,5 +1,5 @@
 import { pathToFileURL } from 'url';
-import { runBenchmark } from '../index.js';
+import { runBenchmark } from '../src/index.mjs';
 const specs = [
   {
     name: 'Regex#test in ESM',
