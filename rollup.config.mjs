@@ -14,5 +14,7 @@ export default {
     esModule: false,
     // use const instead of var when creating statements
     preferConst: true,
+    // do not add _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+    interop: false,
   }
 };
