@@ -7,6 +7,12 @@
     "email": "takuto.wada@gmail.com",
     "url": "https://github.com/twada"
   },
+  "files": [
+    "CHANGELOG.md",
+    "README.md",
+    "src",
+    "dist"
+  ],
   "main": "./dist/index.cjs",
   "exports": {
     "import": "./src/index.mjs",
@@ -20,6 +26,12 @@
   "dependencies": {
     "benchmark": "^2.1.4",
     "extract-git-treeish": "^2.0.0"
+  },
+  "homepage": "http://github.com/twada/benchmark-commits",
+  "bugs": "https://github.com/twada/benchmark-commits/issues",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/twada/benchmark-commits.git"
   },
   "devDependencies": {
     "@twada/mocha-spec-tree-reporter": "^0.2.0",
