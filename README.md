@@ -1,5 +1,24 @@
-# benchmark-commits: Run benchmark on specified git commits
+benchmark-commits
+================================
 
+Run benchmark on specified git commits.
+
+[![Build Status][ci-image]][ci-url]
+[![NPM version][npm-image]][npm-url]
+[![Code Style][style-image]][style-url]
+[![License][license-image]][license-url]
+
+
+INSTALL
+---------------------------------------
+
+```sh
+$ npm install @twada/benchmark-commits
+```
+
+
+SPEC
+---------------------------------------
 
 ### runBenchmark(commitsOrSpecs, register): run benchmark for given `commitsOrSpecs`. Each benchmark function is registered via `register` function
   - if all benchmark executions have finished (at least one benchmark was successful), output benchmark result then resolve with benchmark suite
@@ -21,3 +40,25 @@
     - if async registration function rejects, skip benchmark registration for that `spec`
     - if benchmark registration function does not return function, skip benchmark registration for that `spec`
     - if all benchmark registrations have skipped, rejects with Error
+
+
+AUTHOR
+---------------------------------------
+* [Takuto Wada](https://github.com/twada)
+
+
+LICENSE
+---------------------------------------
+Licensed under the [MIT](https://twada.mit-license.org) license.
+
+[ci-image]: https://github.com/twada/benchmark-commits/workflows/Node.js%20CI/badge.svg
+[ci-url]: https://github.com/twada/benchmark-commits/actions?query=workflow%3A%22Node.js+CI%22
+
+[npm-url]: https://npmjs.org/package/@twada/benchmark-commits
+[npm-image]: https://badge.fury.io/js/%40twada%2Fbenchmark-commits.svg
+
+[style-url]: https://github.com/standard/semistandard
+[style-image]: https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg
+
+[license-url]: https://twada.mit-license.org
+[license-image]: https://img.shields.io/badge/license-MIT-brightgreen.svg
