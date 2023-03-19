@@ -35,11 +35,15 @@
   },
   "devDependencies": {
     "@twada/mocha-spec-tree-reporter": "^0.2.0",
+    "@types/benchmark": "^2.1.2",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^18.15.3",
     "mocha": "^10.0.0",
     "rimraf": "^3.0.2",
     "rollup": "^2.77.0",
     "semistandard": "^16.0.0",
-    "snazzy": "^9.0.0"
+    "snazzy": "^9.0.0",
+    "typescript": "^5.0.2"
   },
   "scripts": {
     "preversion": "npm run build && npm test",
