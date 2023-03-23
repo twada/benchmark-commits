@@ -1,4 +1,4 @@
-import { setupSuite, normalizeSpecs, benchmarkName } from '../src/suite-setup.mjs';
+import { setupSuite, normalizeSpecs, benchmarkName } from '../dist/suite-setup.mjs';
 import { tmpdir } from 'os';
 import { existsSync, rmSync } from 'fs';
 import { join } from 'path';

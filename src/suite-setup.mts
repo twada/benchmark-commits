@@ -1,23 +1,34 @@
-import { EventEmitter } from 'events';
-import { join } from 'path';
-import { spawn } from 'child_process';
+import { EventEmitter } from 'node:events';
+import { join } from 'node:path';
+import { spawn } from 'node:child_process';
 import { extract } from 'extract-git-treeish';
+import type { Suite } from 'benchmark';
+
+type BenchmarkSpec = { name: string, git: string };
+type BenchmarkTarget = BenchmarkSpec | string;
+type BenchmarkInstallation = { spec: BenchmarkSpec, dir: string };
+type BenchmarkArguments = { suite: Suite, spec: BenchmarkSpec, dir: string };
+type BenchmarkFunction = () => void;
+type BenchmarkRegisterFunction = (benchmarkArguments: BenchmarkArguments) => BenchmarkFunction | Promise<BenchmarkFunction>;
 
 class SuiteSetup extends EventEmitter {
-  constructor (suite, workDir) {
+  readonly suite: Suite;
+  readonly workDir: string;
+
+  constructor (suite: Suite, workDir: string) {
     super();
     this.suite = suite;
     this.workDir = workDir;
   }
 
-  run (specs, register) {
+  run (specs: BenchmarkSpec[], register: BenchmarkRegisterFunction): Promise<Suite> {
     const setup = this;
     const destDir = this.workDir;
     const suite = this.suite;
     setup.emit('start', specs);
 
     const preparations = specs.map((spec) => {
-      return new Promise((resolve, reject) => {
+      return new Promise<BenchmarkInstallation>((resolve, reject) => {
         extract({ treeIsh: spec.git, dest: join(destDir, spec.name) }).then(({ dir }) => {
           setup.emit('npm:install:start', spec, dir);
           const spawnOptions = {
@@ -32,7 +43,7 @@ class SuiteSetup extends EventEmitter {
         }).catch(reject);
       });
     }).map((installation) => {
-      return installation.then(({ spec, dir }) => {
+      return installation.then(({ spec, dir }: BenchmarkInstallation) => {
         setup.emit('register', spec, dir);
         return register({ suite, spec, dir });
       });
@@ -62,7 +73,7 @@ class SuiteSetup extends EventEmitter {
   }
 }
 
-function normalizeSpecs (commits) {
+function normalizeSpecs (commits: BenchmarkTarget[]): BenchmarkSpec[] {
   return commits.map((commit) => {
     if (typeof commit === 'string') {
       return {
@@ -75,7 +86,7 @@ function normalizeSpecs (commits) {
   });
 }
 
-function benchmarkName (spec) {
+function benchmarkName (spec: BenchmarkSpec): string {
   if (spec.name !== spec.git) {
     return `${spec.name}(${spec.git})`;
   } else {
@@ -83,9 +94,15 @@ function benchmarkName (spec) {
   }
 }
 
-function setupSuite (suite, workDir) {
+function setupSuite (suite: Suite, workDir: string): SuiteSetup {
   return new SuiteSetup(suite, workDir);
 }
+
+export type {
+  BenchmarkRegisterFunction,
+  BenchmarkTarget,
+  BenchmarkSpec
+};
 
 export {
   setupSuite,
