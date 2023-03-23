@@ -1,26 +1,55 @@
-import { join } from 'path';
-import { rmSync } from 'fs';
+import { join } from 'node:path';
+import { rmSync } from 'node:fs';
 import Benchmark from 'benchmark';
 import { setupSuite, normalizeSpecs, benchmarkName } from './suite-setup.mjs';
+import type { BenchmarkRegisterFunction, BenchmarkTarget, BenchmarkSpec } from './suite-setup.mjs';
 
-const zf = (n, len = 2) => String(n).padStart(len, '0');
+type BenchmarkLogger = {
+  log (str: string): void
+  error (err: any): void
+};
+type BenchmarkAbortEvent = {
+  type: string,
+  timeStamp: string
+}
+type BenchmarkCycleEvent = {
+  type: string,
+  target: Benchmark,
+  currentTarget: Benchmark[]
+}
+type BenchmarkErrorEvent = {
+  type: string,
+  target: Benchmark
+}
+type BenchmarkOptions = {
+  logger?: BenchmarkLogger
+}
+
+const zf = (n: number, len = 2) => String(n).padStart(len, '0');
 const timestampString = (d = new Date()) => `${d.getFullYear()}${zf(d.getMonth() + 1)}${zf(d.getDate())}${zf(d.getHours())}${zf(d.getMinutes())}${zf(d.getSeconds())}${zf(d.getMilliseconds(), 3)}`;
 
 class ConsoleLogger {
-  log (str) {
+  log (str: string) {
     console.log(str);
   }
 
-  error (err) {
+  error (err: any) {
     console.error(err);
   }
 }
 
-function runBenchmark (commitsOrSpecs, register, options) {
+function assertLoggerExists (logger: BenchmarkLogger | undefined): asserts logger is BenchmarkLogger {
+  if (logger === undefined) {
+    throw new Error('options.logger is undefined');
+  }
+}
+
+function runBenchmark (commitsOrSpecs: BenchmarkTarget[], register: BenchmarkRegisterFunction, options?: BenchmarkOptions): Promise<Benchmark.Suite> {
   options = Object.assign({
     logger: new ConsoleLogger()
   }, options);
   const logger = options.logger;
+  assertLoggerExists(logger);
   const destDir = join(process.cwd(), timestampString());
   const setup = setupSuite(new Benchmark.Suite('benchmark-commits'), destDir);
   setup.on('start', (specs) => {
@@ -29,31 +58,31 @@ function runBenchmark (commitsOrSpecs, register, options) {
   setup.on('finish', (suite) => {
     logger.log(`finish preparation of ${suite.length} benchmarks`);
   });
-  setup.on('npm:install:start', (spec, dir) => {
+  setup.on('npm:install:start', (spec: BenchmarkSpec, dir: string) => {
     logger.log(`start npm install of ${benchmarkName(spec)}`);
   });
-  setup.on('npm:install:finish', (spec, dir) => {
+  setup.on('npm:install:finish', (spec: BenchmarkSpec, dir: string) => {
     logger.log(`finish npm install of ${benchmarkName(spec)}`);
   });
-  setup.on('register', (spec, dir) => {
+  setup.on('register', (spec: BenchmarkSpec, dir: string) => {
     logger.log(`register benchmark of ${benchmarkName(spec)}`);
   });
-  setup.on('skip', (spec, reason) => {
+  setup.on('skip', (spec: BenchmarkSpec, reason: any) => {
     logger.log(`skip benchmark of ${benchmarkName(spec)}, reason: [${reason}]`);
   });
-  return new Promise((resolve, reject) => {
+  return new Promise<Benchmark.Suite>((resolve, reject) => {
     const specs = normalizeSpecs(commitsOrSpecs);
-    setup.run(specs, register).then((suite) => {
-      suite.on('abort', function () {
-        logger.error(arguments);
+    setup.run(specs, register).then((suite: Benchmark.Suite) => {
+      suite.on('abort', function (event: BenchmarkAbortEvent) {
+        logger.error(event);
       });
-      suite.on('error', function (event) {
+      suite.on('error', function (event: BenchmarkErrorEvent) {
         logger.error(event.target.error);
       });
       suite.on('start', function () {
         logger.log(`start suite of ${suite.length} benchmarks`);
       });
-      suite.on('cycle', function (event) {
+      suite.on('cycle', function (event: BenchmarkCycleEvent) {
         const benchmark = event.target;
         if (benchmark.aborted) {
           logger.log(`abort benchmark of ${benchmark}`);
@@ -63,11 +92,11 @@ function runBenchmark (commitsOrSpecs, register, options) {
       });
       suite.on('complete', function () {
         try {
-          const successful = this.filter('successful');
+          const successful = suite.filter('successful');
           if (successful.length === 0) {
             reject(new Error('All benchmarks failed'));
           } else {
-            logger.log(`finish suite: fastest is [${this.filter('fastest').map('name')}]`);
+            logger.log(`finish suite: fastest is [${suite.filter('fastest').map('name')}]`);
             resolve(suite);
           }
         } finally {

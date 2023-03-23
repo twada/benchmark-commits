@@ -1,4 +1,4 @@
-const { runBenchmark } = require('../dist/index.cjs');
+const { runBenchmark } = require('../dist/index.js');
 const specs = [
   'nonexistent1',
   'nonexistent2'
