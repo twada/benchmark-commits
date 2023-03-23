@@ -22,55 +22,58 @@ class SuiteSetup extends EventEmitter {
   }
 
   run (specs: BenchmarkSpec[], register: BenchmarkRegisterFunction): Promise<Suite> {
-    const setup = this;
-    const destDir = this.workDir;
-    const suite = this.suite;
-    setup.emit('start', specs);
+    return runSetup(this, specs, register);
+  }
+}
 
-    const preparations = specs.map((spec) => {
-      return new Promise<BenchmarkInstallation>((resolve, reject) => {
-        extract({ treeIsh: spec.git, dest: join(destDir, spec.name) }).then(({ dir }) => {
-          setup.emit('npm:install:start', spec, dir);
-          const spawnOptions = {
-            cwd: dir
-          };
-          spawn('npm', ['install'], spawnOptions)
-            .on('error', reject)
-            .on('close', (code, signal) => {
-              setup.emit('npm:install:finish', spec, dir);
-              resolve({ spec, dir });
-            });
-        }).catch(reject);
-      });
-    }).map((installation) => {
-      return installation.then(({ spec, dir }: BenchmarkInstallation) => {
-        setup.emit('register', spec, dir);
-        return register({ suite, spec, dir });
-      });
+function runSetup (setup: SuiteSetup, specs: BenchmarkSpec[], register: BenchmarkRegisterFunction): Promise<Suite> {
+  const destDir = setup.workDir;
+  const suite = setup.suite;
+  setup.emit('start', specs);
+
+  const preparations = specs.map((spec) => {
+    return new Promise<BenchmarkInstallation>((resolve, reject) => {
+      extract({ treeIsh: spec.git, dest: join(destDir, spec.name) }).then(({ dir }) => {
+        setup.emit('npm:install:start', spec, dir);
+        const spawnOptions = {
+          cwd: dir
+        };
+        spawn('npm', ['install'], spawnOptions)
+          .on('error', reject)
+          .on('close', (code: number, signal: NodeJS.Signals) => {
+            setup.emit('npm:install:finish', spec, dir);
+            resolve({ spec, dir });
+          });
+      }).catch(reject);
     });
+  }).map((installation) => {
+    return installation.then(({ spec, dir }: BenchmarkInstallation) => {
+      setup.emit('register', spec, dir);
+      return register({ suite, spec, dir });
+    });
+  });
 
-    return Promise.allSettled(preparations).then(results => {
-      specs.forEach((spec, i) => {
-        const result = results[i];
-        if (result.status === 'fulfilled') {
-          const fn = result.value;
-          if (typeof fn === 'function') {
-            suite.add(benchmarkName(spec), fn);
-          } else {
-            setup.emit('skip', spec, new TypeError('Benchmark registration function should return function'));
-          }
-        } else if (result.status === 'rejected') {
-          setup.emit('skip', spec, result.reason);
+  return Promise.allSettled(preparations).then(results => {
+    specs.forEach((spec, i) => {
+      const result = results[i];
+      if (result.status === 'fulfilled') {
+        const fn = result.value;
+        if (typeof fn === 'function') {
+          suite.add(benchmarkName(spec), fn);
+        } else {
+          setup.emit('skip', spec, new TypeError('Benchmark registration function should return function'));
         }
-      });
-      if (suite.length === 0) {
-        throw new Error('All benchmark registrations failed');
-      } else {
-        setup.emit('finish', suite);
-        return suite;
+      } else if (result.status === 'rejected') {
+        setup.emit('skip', spec, result.reason);
       }
     });
-  }
+    if (suite.length === 0) {
+      throw new Error('All benchmark registrations failed');
+    } else {
+      setup.emit('finish', suite);
+      return suite;
+    }
+  });
 }
 
 function normalizeSpecs (commits: BenchmarkTarget[]): BenchmarkSpec[] {
