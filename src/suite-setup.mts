@@ -59,7 +59,11 @@ function runSetup (setup: SuiteSetup, specs: BenchmarkSpec[], register: Benchmar
       if (result.status === 'fulfilled') {
         const fn = result.value;
         if (typeof fn === 'function') {
-          suite.add(benchmarkName(spec), fn);
+          if (fn.length === 1) {
+            suite.add(benchmarkName(spec), fn, { defer: true });
+          } else {
+            suite.add(benchmarkName(spec), fn);
+          }
         } else {
           setup.emit('skip', spec, new TypeError('Benchmark registration function should return function'));
         }

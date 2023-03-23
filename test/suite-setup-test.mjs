@@ -83,7 +83,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
     });
   });
 
-  describe('`register` is a benchmark registration function that returns benchmark function. benchmark registration function takes { suite, spec, dir} as arguments. benchmark function takes no arguments.', () => {
+  describe('`register` is a benchmark registration function that returns benchmark function. benchmark registration function takes { suite, spec, dir} as arguments.', () => {
     let targetDir;
     let addCalls;
     let setup;
@@ -136,6 +136,34 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
         return delay(100, fn);
       }).then((suite) => {
         assert(addCalls.length === 3);
+      });
+    });
+
+    it('benchmark function (a function returned from `register` function) with no arguments will be executed synchronously', () => {
+      return setup.run(specs, ({ suite, spec, dir }) => {
+        const prod = require(`${dir}/test/fixtures/prod`);
+        return () => {
+          prod('Hello World!');
+        };
+      }).then((suite) => {
+        assert(addCalls.length === 3);
+        assert(addCalls.every((call) => call.options === undefined));
+      });
+    });
+
+    it('if benchmark function (a function returned from `register` function) takes one argument, it means that the benchmark function is intended to run asynchronously, so register it as deferred function', () => {
+      return setup.run(specs, ({ suite, spec, dir }) => {
+        const prod = require(`${dir}/test/fixtures/prod`);
+        return (deferred) => {
+          setTimeout(() => {
+            prod('Hello World!');
+            deferred.resolve();
+          }, 100);
+        };
+      }).then((suite) => {
+        assert(addCalls.length === 3);
+        assert(addCalls[0].options.defer === true);
+        assert(addCalls.every((call) => call.options.defer === true));
       });
     });
 
