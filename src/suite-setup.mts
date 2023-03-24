@@ -2,13 +2,13 @@ import { EventEmitter } from 'node:events';
 import { join } from 'node:path';
 import { spawn } from 'node:child_process';
 import { extract } from 'extract-git-treeish';
-import type { Suite } from 'benchmark';
+import type { Suite, Deferred } from 'benchmark';
 
 type BenchmarkSpec = { name: string, git: string };
 type BenchmarkTarget = BenchmarkSpec | string;
 type BenchmarkInstallation = { spec: BenchmarkSpec, dir: string };
 type BenchmarkArguments = { suite: Suite, spec: BenchmarkSpec, dir: string };
-type BenchmarkFunction = () => void;
+type BenchmarkFunction = (() => void) | ((deferred: Deferred) => void);
 type BenchmarkRegisterFunction = (benchmarkArguments: BenchmarkArguments) => BenchmarkFunction | Promise<BenchmarkFunction>;
 
 class SuiteSetup extends EventEmitter {
@@ -62,7 +62,7 @@ function runSetup (setup: SuiteSetup, specs: BenchmarkSpec[], register: Benchmar
           if (fn.length === 1) {
             suite.add(benchmarkName(spec), fn, { defer: true });
           } else {
-            suite.add(benchmarkName(spec), fn);
+            suite.add(benchmarkName(spec), fn, { defer: false });
           }
         } else {
           setup.emit('skip', spec, new TypeError('Benchmark registration function should return function'));

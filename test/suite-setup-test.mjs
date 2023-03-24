@@ -147,7 +147,8 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
         };
       }).then((suite) => {
         assert(addCalls.length === 3);
-        assert(addCalls.every((call) => call.options === undefined));
+        assert(addCalls[0].options.defer === false);
+        assert(addCalls.every((call) => call.options.defer === false));
       });
     });
 
