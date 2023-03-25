@@ -139,7 +139,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
       });
     });
 
-    it('benchmark function (a function returned from `register` function) with no arguments will be executed synchronously', () => {
+    it('benchmark function (a function returned from `register` function) with no parameters will be executed synchronously', () => {
       return setup.run(specs, ({ suite, spec, dir }) => {
         const prod = require(`${dir}/test/fixtures/prod`);
         return () => {
@@ -152,7 +152,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
       });
     });
 
-    it('if benchmark function (a function returned from `register` function) takes one argument, it means that the benchmark function is intended to run asynchronously, so register it as deferred function', () => {
+    it('if benchmark function (a function returned from `register` function) takes one parameter, it means that the benchmark function is intended to run asynchronously, so register it as deferred function', () => {
       return setup.run(specs, ({ suite, spec, dir }) => {
         const prod = require(`${dir}/test/fixtures/prod`);
         return (deferred) => {
@@ -168,7 +168,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
       });
     });
 
-    it('if benchmark function (a function returned from `register` function) takes more than one argument, skip benchmark registration for that `spec`', () => {
+    it('if benchmark function (a function returned from `register` function) takes more than one parameter, skip benchmark registration for that `spec`', () => {
       const skipCalls = [];
       setup.on('skip', (spec, reason) => {
         skipCalls.push({ spec, reason });
@@ -184,13 +184,13 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
         return (deferred) => {
           prod('Hello World!');
           deferred.resolve();
-        }
+        };
       }).then((suite) => {
         assert(addCalls.length === 2);
         assert(skipCalls.length === 1);
         const skipped = skipCalls[0];
         assert.deepEqual(skipped.spec, specs[1]);
-        assert.equal(skipped.reason.message, 'Benchmark function shuold have 0 or 1 argument');
+        assert.equal(skipped.reason.message, 'Benchmark function shuold have 0 or 1 parameter');
       });
     });
 

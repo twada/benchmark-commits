@@ -67,7 +67,7 @@ function runSetup (setup: SuiteSetup, specs: BenchmarkSpec[], register: Benchmar
               suite.add(benchmarkName(spec), fn, { defer: true });
               break;
             default:
-              setup.emit('skip', spec, new TypeError('Benchmark function shuold have 0 or 1 argument'));
+              setup.emit('skip', spec, new TypeError('Benchmark function shuold have 0 or 1 parameter'));
           }
         } else {
           setup.emit('skip', spec, new TypeError('Benchmark registration function should return function'));
