@@ -168,6 +168,32 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
       });
     });
 
+    it('if benchmark function (a function returned from `register` function) takes more than one argument, skip benchmark registration for that `spec`', () => {
+      const skipCalls = [];
+      setup.on('skip', (spec, reason) => {
+        skipCalls.push({ spec, reason });
+      });
+      return setup.run(specs, ({ suite, spec, dir }) => {
+        const prod = require(`${dir}/test/fixtures/prod`);
+        if (spec.git === 'bench-test-2') {
+          return (deferred, invalid) => {
+            prod('Hello World!');
+            deferred.resolve();
+          };
+        }
+        return (deferred) => {
+          prod('Hello World!');
+          deferred.resolve();
+        }
+      }).then((suite) => {
+        assert(addCalls.length === 2);
+        assert(skipCalls.length === 1);
+        const skipped = skipCalls[0];
+        assert.deepEqual(skipped.spec, specs[1]);
+        assert.equal(skipped.reason.message, 'Benchmark function shuold have 0 or 1 argument');
+      });
+    });
+
     it('if git commit object in `commitsOrSpecs` does not exist in underlying git repository, skip benchmark registration for that `spec`', () => {
       const specsIncldingError = [
         {
