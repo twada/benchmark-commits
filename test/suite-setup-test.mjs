@@ -152,7 +152,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
       });
     });
 
-    it('if benchmark function (a function returned from `register` function) takes one parameter, it means that the benchmark function is intended to run asynchronously, so register it as deferred function', () => {
+    it('if benchmark function takes one parameter, it means that the benchmark function is intended to run asynchronously, so register it as deferred function', () => {
       return setup.run(specs, ({ suite, spec, dir }) => {
         const prod = require(`${dir}/test/fixtures/prod`);
         return (deferred) => {
@@ -168,7 +168,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
       });
     });
 
-    it('if benchmark function (a function returned from `register` function) takes more than one parameter, skip benchmark registration for that `spec`', () => {
+    it('if benchmark function takes more than one parameter, skip benchmark registration for that `spec` since benchmark function is invalid', () => {
       const skipCalls = [];
       setup.on('skip', (spec, reason) => {
         skipCalls.push({ spec, reason });
