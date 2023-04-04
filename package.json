@@ -75,8 +75,9 @@
     "fix:src": "npm run lint:src -- --fix",
     "fix:test": "npm run lint:test -- --fix",
     "test": "npm run lint && npm run test:all",
-    "test:unit": "mocha --timeout 0 test/suite-setup-test.mjs",
-    "test:doc": "mocha --timeout 0 --reporter @twada/mocha-spec-tree-reporter test",
-    "test:all": "mocha --timeout 0 test"
+    "test:base": "npm run build && mocha --timeout 0",
+    "test:unit": "npm run test:base -- test/suite-setup-test.mjs",
+    "test:doc": "npm run test:all -- --reporter @twada/mocha-spec-tree-reporter",
+    "test:all": "npm run test:base -- test"
   }
 }
