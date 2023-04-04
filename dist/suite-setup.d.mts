@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { EventEmitter } from 'node:events';
-import type { Suite } from 'benchmark';
+import type { Suite, Deferred } from 'benchmark';
 type BenchmarkSpec = {
     name: string;
     git: string;
@@ -11,7 +11,7 @@ type BenchmarkArguments = {
     spec: BenchmarkSpec;
     dir: string;
 };
-type BenchmarkFunction = () => void;
+type BenchmarkFunction = (() => void) | ((deferred: Deferred) => void);
 type BenchmarkRegisterFunction = (benchmarkArguments: BenchmarkArguments) => BenchmarkFunction | Promise<BenchmarkFunction>;
 declare class SuiteSetup extends EventEmitter {
     readonly suite: Suite;
