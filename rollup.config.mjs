@@ -26,13 +26,14 @@ export default {
       // strip 'node:' prefix
       builtinsPrefix: 'strip'
     }),
+    // https://github.com/vladshcherbin/rollup-plugin-copy
     copy({
       targets: [
+        // copy from index.d.mts to index.d.ts while removing the "node:" protocol
         {
           src: 'dist/*.d.mts',
           dest: 'dist/',
           rename: (name, extension, fullPath) => {
-            // copy index.d.mts to index.d.ts with transform below
             // name => 'index.d', extension => 'mts' here
             return `${name}.ts`;
           },
