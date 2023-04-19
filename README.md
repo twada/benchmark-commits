@@ -32,9 +32,12 @@ SPEC
       - if `commitsOrSpecs` is already an array of `spec` object having {name, git} form
         - use them as `spec` object
         - generated benchmark name is `name(git)`
-  - `register` is a benchmark registration function that returns benchmark function. benchmark registration function takes { suite, spec, dir} as arguments. benchmark function takes no arguments.
+  - `register` is a benchmark registration function that returns benchmark function. benchmark registration function takes { suite, spec, dir} as arguments.
     - if `register` function runs synchronously, register benchmark function immediately
     - if `register` function is an async function or returns Promise, register benchmark function asynchronously
+    - benchmark function (a function returned from `register` function) with no parameters will be executed synchronously
+    - if benchmark function takes one parameter, it means that the benchmark function is intended to run asynchronously, so register it as deferred function
+    - if benchmark function takes more than one parameter, skip benchmark registration for that `spec` since benchmark function is invalid
     - if git commit object in `commitsOrSpecs` does not exist in underlying git repository, skip benchmark registration for that `spec`
     - if error occurred while executing registration function, skip benchmark registration for that `spec`
     - if async registration function rejects, skip benchmark registration for that `spec`

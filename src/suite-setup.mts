@@ -2,13 +2,13 @@ import { EventEmitter } from 'node:events';
 import { join } from 'node:path';
 import { spawn } from 'node:child_process';
 import { extract } from 'extract-git-treeish';
-import type { Suite } from 'benchmark';
+import type { Suite, Deferred } from 'benchmark';
 
 type BenchmarkSpec = { name: string, git: string };
 type BenchmarkTarget = BenchmarkSpec | string;
 type BenchmarkInstallation = { spec: BenchmarkSpec, dir: string };
 type BenchmarkArguments = { suite: Suite, spec: BenchmarkSpec, dir: string };
-type BenchmarkFunction = () => void;
+type BenchmarkFunction = (() => void) | ((deferred: Deferred) => void);
 type BenchmarkRegisterFunction = (benchmarkArguments: BenchmarkArguments) => BenchmarkFunction | Promise<BenchmarkFunction>;
 
 class SuiteSetup extends EventEmitter {
@@ -59,7 +59,16 @@ function runSetup (setup: SuiteSetup, specs: BenchmarkSpec[], register: Benchmar
       if (result.status === 'fulfilled') {
         const fn = result.value;
         if (typeof fn === 'function') {
-          suite.add(benchmarkName(spec), fn);
+          switch (fn.length) {
+            case 0:
+              suite.add(benchmarkName(spec), fn, { defer: false });
+              break;
+            case 1:
+              suite.add(benchmarkName(spec), fn, { defer: true });
+              break;
+            default:
+              setup.emit('skip', spec, new Error('Benchmark function shuold have 0 or 1 parameter'));
+          }
         } else {
           setup.emit('skip', spec, new TypeError('Benchmark registration function should return function'));
         }

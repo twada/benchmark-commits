@@ -83,7 +83,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
     });
   });
 
-  describe('`register` is a benchmark registration function that returns benchmark function. benchmark registration function takes { suite, spec, dir} as arguments. benchmark function takes no arguments.', () => {
+  describe('`register` is a benchmark registration function that returns benchmark function. benchmark registration function takes { suite, spec, dir} as arguments.', () => {
     let targetDir;
     let addCalls;
     let setup;
@@ -136,6 +136,61 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
         return delay(100, fn);
       }).then((suite) => {
         assert(addCalls.length === 3);
+      });
+    });
+
+    it('benchmark function (a function returned from `register` function) with no parameters will be executed synchronously', () => {
+      return setup.run(specs, ({ suite, spec, dir }) => {
+        const prod = require(`${dir}/test/fixtures/prod`);
+        return () => {
+          prod('Hello World!');
+        };
+      }).then((suite) => {
+        assert(addCalls.length === 3);
+        assert(addCalls[0].options.defer === false);
+        assert(addCalls.every((call) => call.options.defer === false));
+      });
+    });
+
+    it('if benchmark function takes one parameter, it means that the benchmark function is intended to run asynchronously, so register it as deferred function', () => {
+      return setup.run(specs, ({ suite, spec, dir }) => {
+        const prod = require(`${dir}/test/fixtures/prod`);
+        return (deferred) => {
+          setTimeout(() => {
+            prod('Hello World!');
+            deferred.resolve();
+          }, 100);
+        };
+      }).then((suite) => {
+        assert(addCalls.length === 3);
+        assert(addCalls[0].options.defer === true);
+        assert(addCalls.every((call) => call.options.defer === true));
+      });
+    });
+
+    it('if benchmark function takes more than one parameter, skip benchmark registration for that `spec` since benchmark function is invalid', () => {
+      const skipCalls = [];
+      setup.on('skip', (spec, reason) => {
+        skipCalls.push({ spec, reason });
+      });
+      return setup.run(specs, ({ suite, spec, dir }) => {
+        const prod = require(`${dir}/test/fixtures/prod`);
+        if (spec.git === 'bench-test-2') {
+          return (deferred, invalid) => {
+            prod('Hello World!');
+            deferred.resolve();
+          };
+        }
+        return (deferred) => {
+          prod('Hello World!');
+          deferred.resolve();
+        };
+      }).then((suite) => {
+        assert(addCalls.length === 2);
+        assert(skipCalls.length === 1);
+        const skipped = skipCalls[0];
+        assert.deepEqual(skipped.spec, specs[1]);
+        assert.equal(skipped.reason.message, 'Benchmark function shuold have 0 or 1 parameter');
       });
     });
 
