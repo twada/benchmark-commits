@@ -28,7 +28,7 @@ function runSetup(setup, specs, register) {
                 };
                 child_process.spawn('npm', ['install'], spawnOptions)
                     .on('error', reject)
-                    .on('close', (code, signal) => {
+                    .on('close', (_code, _signal) => {
                     setup.emit('npm:install:finish', spec, dir);
                     resolve({ spec, dir });
                 });

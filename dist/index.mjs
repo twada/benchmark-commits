@@ -8,6 +8,7 @@ class ConsoleLogger {
     log(str) {
         console.log(str);
     }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     error(err) {
         console.error(err);
     }
@@ -31,15 +32,16 @@ function runBenchmark(commitsOrSpecs, register, options) {
     setup.on('finish', (suite) => {
         logger.log(`finish preparation of ${suite.length} benchmarks`);
     });
-    setup.on('npm:install:start', (spec, dir) => {
+    setup.on('npm:install:start', (spec, _dir) => {
         logger.log(`start npm install of ${benchmarkName(spec)}`);
     });
-    setup.on('npm:install:finish', (spec, dir) => {
+    setup.on('npm:install:finish', (spec, _dir) => {
         logger.log(`finish npm install of ${benchmarkName(spec)}`);
     });
-    setup.on('register', (spec, dir) => {
+    setup.on('register', (spec, _dir) => {
         logger.log(`register benchmark of ${benchmarkName(spec)}`);
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setup.on('skip', (spec, reason) => {
         logger.log(`skip benchmark of ${benchmarkName(spec)}, reason: [${reason}]`);
     });

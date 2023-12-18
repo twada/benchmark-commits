@@ -24,7 +24,7 @@ class FakeBenchmarkSuite extends EventEmitter {
   }
 }
 const delay = (millis, val) => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, _reject) => {
     setTimeout(() => {
       resolve(val);
     }, millis);
@@ -117,35 +117,35 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
     });
 
     it('if `register` function runs synchronously, register benchmark function immediately ', () => {
-      return setup.run(specs, ({ suite, spec, dir }) => {
+      return setup.run(specs, ({ suite: _suite, spec: _spec, dir }) => {
         const prod = require(`${dir}/test/fixtures/prod`);
         return () => {
           prod('Hello World!');
         };
-      }).then((suite) => {
+      }).then((_suite) => {
         assert(addCalls.length === 3);
       });
     });
 
     it('if `register` function is an async function or returns Promise, register benchmark function asynchronously', () => {
-      return setup.run(specs, ({ suite, spec, dir }) => {
+      return setup.run(specs, ({ suite: _suite, spec: _spec, dir }) => {
         const prod = require(`${dir}/test/fixtures/prod`);
         const fn = () => {
           prod('Hello World!');
         };
         return delay(100, fn);
-      }).then((suite) => {
+      }).then((_suite) => {
         assert(addCalls.length === 3);
       });
     });
 
     it('benchmark function (a function returned from `register` function) with no parameters will be executed synchronously', () => {
-      return setup.run(specs, ({ suite, spec, dir }) => {
+      return setup.run(specs, ({ suite: _suite, spec: _spec, dir }) => {
         const prod = require(`${dir}/test/fixtures/prod`);
         return () => {
           prod('Hello World!');
         };
-      }).then((suite) => {
+      }).then((_suite) => {
         assert(addCalls.length === 3);
         assert(addCalls[0].options.defer === false);
         assert(addCalls.every((call) => call.options.defer === false));
@@ -153,7 +153,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
     });
 
     it('if benchmark function takes one parameter, it means that the benchmark function is intended to run asynchronously, so register it as deferred function', () => {
-      return setup.run(specs, ({ suite, spec, dir }) => {
+      return setup.run(specs, ({ suite: _suite, spec: _spec, dir }) => {
         const prod = require(`${dir}/test/fixtures/prod`);
         return (deferred) => {
           setTimeout(() => {
@@ -161,7 +161,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
             deferred.resolve();
           }, 100);
         };
-      }).then((suite) => {
+      }).then((_suite) => {
         assert(addCalls.length === 3);
         assert(addCalls[0].options.defer === true);
         assert(addCalls.every((call) => call.options.defer === true));
@@ -173,10 +173,10 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
       setup.on('skip', (spec, reason) => {
         skipCalls.push({ spec, reason });
       });
-      return setup.run(specs, ({ suite, spec, dir }) => {
+      return setup.run(specs, ({ suite: _suite, spec, dir }) => {
         const prod = require(`${dir}/test/fixtures/prod`);
         if (spec.git === 'bench-test-2') {
-          return (deferred, invalid) => {
+          return (deferred, _invalid) => {
             prod('Hello World!');
             deferred.resolve();
           };
@@ -185,7 +185,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
           prod('Hello World!');
           deferred.resolve();
         };
-      }).then((suite) => {
+      }).then((_suite) => {
         assert(addCalls.length === 2);
         assert(skipCalls.length === 1);
         const skipped = skipCalls[0];
@@ -210,12 +210,12 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
       setup.on('skip', (spec, reason) => {
         skipCalls.push({ spec, reason });
       });
-      return setup.run(specsIncldingError, ({ suite, spec, dir }) => {
+      return setup.run(specsIncldingError, ({ suite: _suite, spec: _spec, dir }) => {
         const prod = require(`${dir}/test/fixtures/prod`);
         return () => {
           prod('Hello World!');
         };
-      }).then((suite) => {
+      }).then((_suite) => {
         assert(addCalls.length === 3);
         assert(skipCalls.length === 2);
         assert.deepEqual(skipCalls[0].spec, { name: 'error1', git: 'nonexistent1' });
@@ -228,7 +228,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
       setup.on('skip', (spec, reason) => {
         skipCalls.push({ spec, reason });
       });
-      return setup.run(specs, ({ suite, spec, dir }) => {
+      return setup.run(specs, ({ suite: _suite, spec, dir }) => {
         if (spec.git === 'bench-test-2') {
           throw new Error('Some Error');
         }
@@ -236,7 +236,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
         return () => {
           prod('Hello World!');
         };
-      }).then((suite) => {
+      }).then((_suite) => {
         assert(addCalls.length === 2);
         assert(skipCalls.length === 1);
         assert.deepEqual(skipCalls[0].spec, {
@@ -251,7 +251,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
       setup.on('skip', (spec, reason) => {
         skipCalls.push({ spec, reason });
       });
-      return setup.run(specs, ({ suite, spec, dir }) => {
+      return setup.run(specs, ({ suite: _suite, spec, dir }) => {
         const prod = require(`${dir}/test/fixtures/prod`);
         const fn = () => {
           prod('Hello World!');
@@ -260,7 +260,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
           return rejectLater(100, new Error('Rejection'));
         }
         return delay(100, fn);
-      }).then((suite) => {
+      }).then((_suite) => {
         assert(addCalls.length === 2);
         assert(skipCalls.length === 1);
         assert.deepEqual(skipCalls[0].spec, {
@@ -275,7 +275,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
       setup.on('skip', (spec, reason) => {
         skipCalls.push({ spec, reason });
       });
-      return setup.run(specs, ({ suite, spec, dir }) => {
+      return setup.run(specs, ({ suite: _suite, spec, dir }) => {
         if (spec.git === 'bench-test-2') {
           return 'not a function';
         }
@@ -283,7 +283,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
         return () => {
           prod('Hello World!');
         };
-      }).then((suite) => {
+      }).then((_suite) => {
         assert(addCalls.length === 2);
         assert(skipCalls.length === 1);
         assert.deepEqual(skipCalls[0].spec, {
@@ -298,7 +298,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
       setup.on('skip', (spec, reason) => {
         skipCalls.push({ spec, reason });
       });
-      return setup.run(specs, ({ suite, spec, dir }) => {
+      return setup.run(specs, ({ suite: _suite, spec: _spec, dir: _dir }) => {
         throw new Error('registration error');
       }).then(shouldNotBeFulfilled, (err) => {
         assert(addCalls.length === 0);

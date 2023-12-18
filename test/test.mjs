@@ -52,7 +52,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
     const config = {
       logger: spyLogger
     };
-    return runBenchmark(specs, ({ suite, spec, dir }) => {
+    return runBenchmark(specs, ({ suite: _suite, spec: _spec, dir }) => {
       const prod = require(`${dir}/test/fixtures/prod`);
       return () => {
         prod('Hello World!');
@@ -95,7 +95,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
     const config = {
       logger: spyLogger
     };
-    return runBenchmark(specs, ({ suite, spec, dir }) => {
+    return runBenchmark(specs, ({ suite: _suite, spec, dir }) => {
       require(`${dir}/test/fixtures/prod`);
       return () => {
         throw new Error(`execution error ${spec.git}`);

@@ -40,7 +40,7 @@ function runSetup (setup: SuiteSetup, specs: BenchmarkSpec[], register: Benchmar
         };
         spawn('npm', ['install'], spawnOptions)
           .on('error', reject)
-          .on('close', (code: number, signal: NodeJS.Signals) => {
+          .on('close', (_code: number, _signal: NodeJS.Signals) => {
             setup.emit('npm:install:finish', spec, dir);
             resolve({ spec, dir });
           });
