@@ -1,4 +1,4 @@
-/// <reference types="node" />
+/// <reference types="node" resolution-mode="require"/>
 import { EventEmitter } from 'node:events';
 import type { Suite, Deferred } from 'benchmark';
 type BenchmarkSpec = {
