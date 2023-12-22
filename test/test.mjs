@@ -33,7 +33,12 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
     const specs = [
       {
         name: 'Regex#test',
-        git: 'bench-test-1'
+        git: 'bench-test-1',
+        prepare: [
+          'ls',
+          'ls -l'
+        ],
+        workspace: 'test/fixtures'
       },
       {
         name: 'String#indexOf',
