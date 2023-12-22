@@ -63,14 +63,14 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
       const logs = spyLogger.logCalls;
       assert(logs.shift() === 'start preparation of 4 benchmarks');
       assert.deepEqual(sorted(take(logs, 9)), sorted([
-        'start npm install of Regex#test(bench-test-1)',
-        'start npm install of String#indexOf(bench-test-2)',
-        'start npm install of String#match(bench-test-3)',
-        'finish npm install of Regex#test(bench-test-1)',
+        'start preparation of Regex#test(bench-test-1)',
+        'start preparation of String#indexOf(bench-test-2)',
+        'start preparation of String#match(bench-test-3)',
+        'finish preparation of Regex#test(bench-test-1)',
         'register benchmark of Regex#test(bench-test-1)',
-        'finish npm install of String#indexOf(bench-test-2)',
+        'finish preparation of String#indexOf(bench-test-2)',
         'register benchmark of String#indexOf(bench-test-2)',
-        'finish npm install of String#match(bench-test-3)',
+        'finish preparation of String#match(bench-test-3)',
         'register benchmark of String#match(bench-test-3)'
       ]));
       assert(logs.shift() === 'skip benchmark of to-be-skipped(nonexistent1), reason: [Error: Specified <tree-ish> does not exist [nonexistent1]]');
@@ -104,11 +104,11 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
       const logs = spyLogger.logCalls;
       assert(logs.shift() === 'start preparation of 2 benchmarks');
       assert.deepEqual(sorted(take(logs, 6)), sorted([
-        'start npm install of bench-test-2',
-        'start npm install of bench-test-1',
-        'finish npm install of bench-test-2',
+        'start preparation of bench-test-2',
+        'start preparation of bench-test-1',
+        'finish preparation of bench-test-2',
         'register benchmark of bench-test-2',
-        'finish npm install of bench-test-1',
+        'finish preparation of bench-test-1',
         'register benchmark of bench-test-1'
       ]));
       assert.deepEqual(take(logs, 4), [

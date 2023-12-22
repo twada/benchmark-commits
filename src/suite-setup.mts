@@ -3,8 +3,10 @@ import { join } from 'node:path';
 import { spawn } from 'node:child_process';
 import { extract } from 'extract-git-treeish';
 import type { Suite, Deferred } from 'benchmark';
+import type { SpawnOptionsWithoutStdio } from 'node:child_process';
 
-type BenchmarkSpec = { name: string, git: string };
+type NormalizedBenchmarkSpec = { name: string, git: string, prepare: string[] };
+type BenchmarkSpec = { name: string, git: string, prepare?: string[] };
 type BenchmarkTarget = BenchmarkSpec | string;
 type BenchmarkInstallation = { spec: BenchmarkSpec, dir: string };
 type BenchmarkArguments = { suite: Suite, spec: BenchmarkSpec, dir: string };
@@ -21,12 +23,27 @@ class SuiteSetup extends EventEmitter {
     this.workDir = workDir;
   }
 
-  run (specs: BenchmarkSpec[], register: BenchmarkRegisterFunction): Promise<Suite> {
+  run (specs: NormalizedBenchmarkSpec[], register: BenchmarkRegisterFunction): Promise<Suite> {
     return runSetup(this, specs, register);
   }
 }
 
-function runSetup (setup: SuiteSetup, specs: BenchmarkSpec[], register: BenchmarkRegisterFunction): Promise<Suite> {
+function spawnPromise (command: string, args: string[], options: SpawnOptionsWithoutStdio): Promise<number> {
+  return new Promise((resolve, reject) => {
+    spawn(command, args, options)
+      .on('error', reject)
+      .on('close', (code: number, _signal: NodeJS.Signals) => {
+        resolve(code);
+      });
+  });
+}
+
+function parseLine (str: string): { command: string, args: string[] } {
+  const tokens = str.split(' ');
+  return { command: tokens[0], args: tokens.slice(1) };
+}
+
+function runSetup (setup: SuiteSetup, specs: NormalizedBenchmarkSpec[], register: BenchmarkRegisterFunction): Promise<Suite> {
   const destDir = setup.workDir;
   const suite = setup.suite;
   setup.emit('start', specs);
@@ -34,16 +51,20 @@ function runSetup (setup: SuiteSetup, specs: BenchmarkSpec[], register: Benchmar
   const preparations = specs.map((spec) => {
     return new Promise<BenchmarkInstallation>((resolve, reject) => {
       extract({ treeIsh: spec.git, dest: join(destDir, spec.name) }).then(({ dir }) => {
-        setup.emit('npm:install:start', spec, dir);
+        setup.emit('preparation:start', spec, dir);
         const spawnOptions = {
           cwd: dir
         };
-        spawn('npm', ['install'], spawnOptions)
-          .on('error', reject)
-          .on('close', (_code: number, _signal: NodeJS.Signals) => {
-            setup.emit('npm:install:finish', spec, dir);
-            resolve({ spec, dir });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spec.prepare.reduce((promise: Promise<any>, nextCommand: string) => {
+          return promise.then(() => {
+            const { command, args } = parseLine(nextCommand);
+            return spawnPromise(command, args, spawnOptions);
           });
+        }, Promise.resolve()).then(() => {
+          setup.emit('preparation:finish', spec, dir);
+          resolve({ spec, dir });
+        }).catch(reject);
       }).catch(reject);
     });
   }).map((installation) => {
@@ -85,15 +106,18 @@ function runSetup (setup: SuiteSetup, specs: BenchmarkSpec[], register: Benchmar
   });
 }
 
-function normalizeSpecs (commits: BenchmarkTarget[]): BenchmarkSpec[] {
+function normalizeSpecs (commits: BenchmarkTarget[]): NormalizedBenchmarkSpec[] {
   return commits.map((commit) => {
     if (typeof commit === 'string') {
       return {
         name: commit,
-        git: commit
+        git: commit,
+        prepare: ['npm install']
       };
     } else {
-      return Object.assign({}, commit);
+      return Object.assign({
+        prepare: ['npm install']
+      }, commit);
     }
   });
 }
@@ -111,6 +135,7 @@ function setupSuite (suite: Suite, workDir: string): SuiteSetup {
 }
 
 export type {
+  NormalizedBenchmarkSpec,
   BenchmarkRegisterFunction,
   BenchmarkTarget,
   BenchmarkSpec

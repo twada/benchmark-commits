@@ -43,7 +43,7 @@ const shouldNotBeFulfilled = () => {
 
 describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commitsOrSpecs`. Each benchmark function is registered via `register` function', () => {
   describe('`commitsOrSpecs` is an array of either (1) string specifying git tag/branch/commit or (2) object having `name` and `git` properties, pointing to git object to be checked out for the benchmark', () => {
-    describe('internally, each item in `commitsOrSpecs` is normalized to `spec` object in {name, git} form', () => {
+    describe('internally, each item in `commitsOrSpecs` is normalized to `spec` object in {name, git, prepare} form', () => {
       describe('if `commitsOrSpecs` is an array of string specifying git tag/branch/commit', () => {
         it('converts each string to {name, git} form. name === git in this case.', () => {
           const commits = [
@@ -52,13 +52,13 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
             'bench-test-3'
           ];
           assert.deepEqual(normalizeSpecs(commits), [
-            { name: 'bench-test-1', git: 'bench-test-1' },
-            { name: 'bench-test-2', git: 'bench-test-2' },
-            { name: 'bench-test-3', git: 'bench-test-3' }
+            { name: 'bench-test-1', git: 'bench-test-1', prepare: ['npm install'] },
+            { name: 'bench-test-2', git: 'bench-test-2', prepare: ['npm install'] },
+            { name: 'bench-test-3', git: 'bench-test-3', prepare: ['npm install'] }
           ]);
         });
         it('use git object name as benchmark name', () => {
-          const spec = { name: 'bench-test-1', git: 'bench-test-1' };
+          const spec = { name: 'bench-test-1', git: 'bench-test-1', prepare: ['npm install'] };
           assert(benchmarkName(spec) === 'bench-test-1');
         });
       });
@@ -70,14 +70,31 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
             { name: 'String#match', git: 'bench-test-3' }
           ];
           assert.deepEqual(normalizeSpecs(commits), [
-            { name: 'Regex#test', git: 'bench-test-1' },
-            { name: 'String#indexOf', git: 'bench-test-2' },
-            { name: 'String#match', git: 'bench-test-3' }
+            { name: 'Regex#test', git: 'bench-test-1', prepare: ['npm install'] },
+            { name: 'String#indexOf', git: 'bench-test-2', prepare: ['npm install'] },
+            { name: 'String#match', git: 'bench-test-3', prepare: ['npm install'] }
           ]);
         });
         it('generated benchmark name is `name(git)`', () => {
           const spec = { name: 'Regex#test', git: 'bench-test-1' };
           assert(benchmarkName(spec) === 'Regex#test(bench-test-1)');
+        });
+      });
+      describe('if `commitsOrSpecs` is already an array of `spec` object having {name, git, prepare} form', () => {
+        it('use them as `spec` object', () => {
+          const commits = [
+            { name: 'Regex#test', git: 'bench-test-1', prepare: [
+              'npm install',
+              'npm run build'
+            ] },
+            { name: 'String#indexOf', git: 'bench-test-2' },
+            { name: 'String#match', git: 'bench-test-3' }
+          ];
+          assert.deepEqual(normalizeSpecs(commits), [
+            { name: 'Regex#test', git: 'bench-test-1', prepare: ['npm install', 'npm run build'] },
+            { name: 'String#indexOf', git: 'bench-test-2', prepare: ['npm install'] },
+            { name: 'String#match', git: 'bench-test-3', prepare: ['npm install'] }
+          ]);
         });
       });
     });
@@ -93,15 +110,18 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
       specs = [
         {
           name: 'Regex#test',
-          git: 'bench-test-1'
+          git: 'bench-test-1',
+          prepare: ['npm install']
         },
         {
           name: 'String#indexOf',
-          git: 'bench-test-2'
+          git: 'bench-test-2',
+          prepare: ['npm install']
         },
         {
           name: 'String#match',
-          git: 'bench-test-3'
+          git: 'bench-test-3',
+          prepare: ['npm install']
         }
       ];
       addCalls = [];
@@ -198,12 +218,14 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
       const specsIncldingError = [
         {
           name: 'error1',
-          git: 'nonexistent1'
+          git: 'nonexistent1',
+          prepare: ['npm install']
         },
         ...specs,
         {
           name: 'error2',
-          git: 'nonexistent2'
+          git: 'nonexistent2',
+          prepare: ['npm install']
         }
       ];
       const skipCalls = [];
@@ -218,8 +240,8 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
       }).then((_suite) => {
         assert(addCalls.length === 3);
         assert(skipCalls.length === 2);
-        assert.deepEqual(skipCalls[0].spec, { name: 'error1', git: 'nonexistent1' });
-        assert.deepEqual(skipCalls[1].spec, { name: 'error2', git: 'nonexistent2' });
+        assert.deepEqual(skipCalls[0].spec, { name: 'error1', git: 'nonexistent1', prepare: ['npm install'] });
+        assert.deepEqual(skipCalls[1].spec, { name: 'error2', git: 'nonexistent2', prepare: ['npm install'] });
       });
     });
 
@@ -241,7 +263,8 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
         assert(skipCalls.length === 1);
         assert.deepEqual(skipCalls[0].spec, {
           name: 'String#indexOf',
-          git: 'bench-test-2'
+          git: 'bench-test-2',
+          prepare: ['npm install']
         });
       });
     });
@@ -265,7 +288,8 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
         assert(skipCalls.length === 1);
         assert.deepEqual(skipCalls[0].spec, {
           name: 'String#indexOf',
-          git: 'bench-test-2'
+          git: 'bench-test-2',
+          prepare: ['npm install']
         });
       });
     });
@@ -288,7 +312,8 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
         assert(skipCalls.length === 1);
         assert.deepEqual(skipCalls[0].spec, {
           name: 'String#indexOf',
-          git: 'bench-test-2'
+          git: 'bench-test-2',
+          prepare: ['npm install']
         });
       });
     });

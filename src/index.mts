@@ -2,7 +2,7 @@ import { join } from 'node:path';
 import { rmSync } from 'node:fs';
 import Benchmark from 'benchmark';
 import { setupSuite, normalizeSpecs, benchmarkName } from './suite-setup.mjs';
-import type { BenchmarkRegisterFunction, BenchmarkTarget, BenchmarkSpec } from './suite-setup.mjs';
+import type { NormalizedBenchmarkSpec, BenchmarkRegisterFunction, BenchmarkTarget } from './suite-setup.mjs';
 
 type BenchmarkLogger = {
   log (str: string): void
@@ -60,17 +60,17 @@ function runBenchmark (commitsOrSpecs: BenchmarkTarget[], register: BenchmarkReg
   setup.on('finish', (suite) => {
     logger.log(`finish preparation of ${suite.length} benchmarks`);
   });
-  setup.on('npm:install:start', (spec: BenchmarkSpec, _dir: string) => {
-    logger.log(`start npm install of ${benchmarkName(spec)}`);
+  setup.on('preparation:start', (spec: NormalizedBenchmarkSpec, _dir: string) => {
+    logger.log(`start preparation of ${benchmarkName(spec)}`);
   });
-  setup.on('npm:install:finish', (spec: BenchmarkSpec, _dir: string) => {
-    logger.log(`finish npm install of ${benchmarkName(spec)}`);
+  setup.on('preparation:finish', (spec: NormalizedBenchmarkSpec, _dir: string) => {
+    logger.log(`finish preparation of ${benchmarkName(spec)}`);
   });
-  setup.on('register', (spec: BenchmarkSpec, _dir: string) => {
+  setup.on('register', (spec: NormalizedBenchmarkSpec, _dir: string) => {
     logger.log(`register benchmark of ${benchmarkName(spec)}`);
   });
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setup.on('skip', (spec: BenchmarkSpec, reason: any) => {
+  setup.on('skip', (spec: NormalizedBenchmarkSpec, reason: any) => {
     logger.log(`skip benchmark of ${benchmarkName(spec)}, reason: [${reason}]`);
   });
   return new Promise<Benchmark.Suite>((resolve, reject) => {
