@@ -83,10 +83,14 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
       describe('if `commitsOrSpecs` is already an array of `spec` object having {name, git, prepare} form', () => {
         it('use them as `spec` object', () => {
           const commits = [
-            { name: 'Regex#test', git: 'bench-test-1', prepare: [
-              'npm install',
-              'npm run build'
-            ] },
+            {
+              name: 'Regex#test',
+              git: 'bench-test-1',
+              prepare: [
+                'npm install',
+                'npm run build'
+              ]
+            },
             { name: 'String#indexOf', git: 'bench-test-2' },
             { name: 'String#match', git: 'bench-test-3' }
           ];
