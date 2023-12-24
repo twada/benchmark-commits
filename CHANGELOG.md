@@ -1,3 +1,13 @@
+## [0.3.0](http://github.com/twada/benchmark-commits/releases/tag/v0.3.0) (2023-12-24)
+
+
+#### Features
+
+* `prepare` option to configure multi-step preparations ([e9953743](http://github.com/twada/benchmark-commits/commit/e995374385c17f33d60986d89bd6b9d9987f0a21))
+* `workspace` option to work with monorepo ([c89fc8f5](http://github.com/twada/benchmark-commits/commit/c89fc8f5c595c495c8249d28fa25f0ba2074a0d4))
+  * now `dir` points to workspace when workspace option is provided ([8aaa1688](http://github.com/twada/benchmark-commits/commit/8aaa1688deb9fac77a9afc7aff7ce34e50fe8dc4))
+
+
 ## [0.2.0](http://github.com/twada/benchmark-commits/releases/tag/v0.2.0) (2023-12-18)
 
 
