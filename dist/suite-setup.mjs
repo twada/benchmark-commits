@@ -12,6 +12,19 @@ class SuiteSetup extends EventEmitter {
         return runSetup(this, specs, register);
     }
 }
+function spawnPromise(command, args, options) {
+    return new Promise((resolve, reject) => {
+        spawn(command, args, options)
+            .on('error', reject)
+            .on('close', (code, _signal) => {
+            resolve(code);
+        });
+    });
+}
+function parseLine(str) {
+    const tokens = str.split(' ');
+    return { command: tokens[0], args: tokens.slice(1) };
+}
 function runSetup(setup, specs, register) {
     const destDir = setup.workDir;
     const suite = setup.suite;
@@ -19,16 +32,21 @@ function runSetup(setup, specs, register) {
     const preparations = specs.map((spec) => {
         return new Promise((resolve, reject) => {
             extract({ treeIsh: spec.git, dest: join(destDir, spec.name) }).then(({ dir }) => {
-                setup.emit('npm:install:start', spec, dir);
+                const cwd = spec.workspace ? join(dir, spec.workspace) : dir;
+                setup.emit('preparation:start', spec, cwd);
                 const spawnOptions = {
-                    cwd: dir
+                    cwd
                 };
-                spawn('npm', ['install'], spawnOptions)
-                    .on('error', reject)
-                    .on('close', (_code, _signal) => {
-                    setup.emit('npm:install:finish', spec, dir);
-                    resolve({ spec, dir });
-                });
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                spec.prepare.reduce((promise, nextCommand) => {
+                    return promise.then(() => {
+                        const { command, args } = parseLine(nextCommand);
+                        return spawnPromise(command, args, spawnOptions);
+                    });
+                }, Promise.resolve()).then(() => {
+                    setup.emit('preparation:finish', spec, cwd);
+                    resolve({ spec, dir: cwd });
+                }).catch(reject);
             }).catch(reject);
         });
     }).map((installation) => {
@@ -76,11 +94,14 @@ function normalizeSpecs(commits) {
         if (typeof commit === 'string') {
             return {
                 name: commit,
-                git: commit
+                git: commit,
+                prepare: ['npm install']
             };
         }
         else {
-            return Object.assign({}, commit);
+            return Object.assign({
+                prepare: ['npm install']
+            }, commit);
         }
     });
 }

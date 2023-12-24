@@ -1,9 +1,17 @@
 /// <reference types="node" resolution-mode="require"/>
 import { EventEmitter } from 'node:events';
 import type { Suite, Deferred } from 'benchmark';
+type NormalizedBenchmarkSpec = {
+    name: string;
+    git: string;
+    prepare: string[];
+    workspace?: string;
+};
 type BenchmarkSpec = {
     name: string;
     git: string;
+    prepare?: string[];
+    workspace?: string;
 };
 type BenchmarkTarget = BenchmarkSpec | string;
 type BenchmarkArguments = {
@@ -17,10 +25,10 @@ declare class SuiteSetup extends EventEmitter {
     readonly suite: Suite;
     readonly workDir: string;
     constructor(suite: Suite, workDir: string);
-    run(specs: BenchmarkSpec[], register: BenchmarkRegisterFunction): Promise<Suite>;
+    run(specs: NormalizedBenchmarkSpec[], register: BenchmarkRegisterFunction): Promise<Suite>;
 }
-declare function normalizeSpecs(commits: BenchmarkTarget[]): BenchmarkSpec[];
+declare function normalizeSpecs(commits: BenchmarkTarget[]): NormalizedBenchmarkSpec[];
 declare function benchmarkName(spec: BenchmarkSpec): string;
 declare function setupSuite(suite: Suite, workDir: string): SuiteSetup;
-export type { BenchmarkRegisterFunction, BenchmarkTarget, BenchmarkSpec };
+export type { NormalizedBenchmarkSpec, BenchmarkRegisterFunction, BenchmarkTarget, BenchmarkSpec };
 export { setupSuite, normalizeSpecs, benchmarkName };
