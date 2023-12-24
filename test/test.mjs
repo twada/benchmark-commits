@@ -37,8 +37,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
         prepare: [
           'ls',
           'ls -l'
-        ],
-        workspace: 'test/fixtures'
+        ]
       },
       {
         name: 'String#indexOf',

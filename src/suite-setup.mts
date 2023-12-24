@@ -51,9 +51,10 @@ function runSetup (setup: SuiteSetup, specs: NormalizedBenchmarkSpec[], register
   const preparations = specs.map((spec) => {
     return new Promise<BenchmarkInstallation>((resolve, reject) => {
       extract({ treeIsh: spec.git, dest: join(destDir, spec.name) }).then(({ dir }) => {
-        setup.emit('preparation:start', spec, dir);
+        const cwd = spec.workspace ? join(dir, spec.workspace) : dir;
+        setup.emit('preparation:start', spec, cwd);
         const spawnOptions = {
-          cwd: spec.workspace ? join(dir, spec.workspace) : dir
+          cwd
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spec.prepare.reduce((promise: Promise<any>, nextCommand: string) => {
@@ -62,8 +63,8 @@ function runSetup (setup: SuiteSetup, specs: NormalizedBenchmarkSpec[], register
             return spawnPromise(command, args, spawnOptions);
           });
         }, Promise.resolve()).then(() => {
-          setup.emit('preparation:finish', spec, dir);
-          resolve({ spec, dir });
+          setup.emit('preparation:finish', spec, cwd);
+          resolve({ spec, dir: cwd });
         }).catch(reject);
       }).catch(reject);
     });
