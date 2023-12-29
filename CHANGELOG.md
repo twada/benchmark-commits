@@ -1,3 +1,11 @@
+### [0.3.1](http://github.com/twada/benchmark-commits/releases/tag/v0.3.1) (2023-12-30)
+
+
+#### Bug Fixes
+
+* wait for rmSync finish removing work dir ([931ef957](http://github.com/twada/benchmark-commits/commit/931ef957d76cbc5eb344b16b6ea239bd3c12b7ca))
+
+
 ## [0.3.0](http://github.com/twada/benchmark-commits/releases/tag/v0.3.0) (2023-12-24)
 
 
