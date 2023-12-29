@@ -95,15 +95,16 @@ function runBenchmark (commitsOrSpecs: BenchmarkTarget[], register: BenchmarkReg
       });
       suite.on('complete', function () {
         try {
-          const successful = suite.filter('successful');
-          if (successful.length === 0) {
-            reject(new Error('All benchmarks failed'));
-          } else {
-            logger.log(`finish suite: fastest is [${suite.filter('fastest').map('name')}]`);
-            resolve(suite);
-          }
-        } finally {
           rmSync(destDir, { recursive: true, force: true });
+        } catch (err) {
+          logger.error(err);
+        }
+        const successful = suite.filter('successful');
+        if (successful.length === 0) {
+          reject(new Error('All benchmarks failed'));
+        } else {
+          logger.log(`finish suite: fastest is [${suite.filter('fastest').map('name')}]`);
+          resolve(suite);
         }
       });
       suite.run({ async: true });
