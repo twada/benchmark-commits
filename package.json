@@ -1,7 +1,7 @@
 {
   "name": "@twada/benchmark-commits",
   "description": "Run benchmark on specified git commits",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "author": {
     "name": "Takuto Wada",
     "email": "takuto.wada@gmail.com",
