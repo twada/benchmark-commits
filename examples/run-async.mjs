@@ -2,7 +2,7 @@ import { pathToFileURL } from 'url';
 import { runBenchmark } from '../dist/index.mjs';
 const specs = [
   {
-    name: 'Regex#test in ESM',
+    name: 'Regex#test',
     git: 'bench-test-1-esm',
     workspace: 'test/fixtures',
     prepare: [
@@ -10,7 +10,7 @@ const specs = [
     ]
   },
   {
-    name: 'String#indexOf in ESM',
+    name: 'String#indexOf',
     git: 'bench-test-2-esm',
     workspace: 'test/fixtures',
     prepare: [
@@ -18,7 +18,7 @@ const specs = [
     ]
   },
   {
-    name: 'String#match in ESM',
+    name: 'String#match',
     git: 'bench-test-3-esm',
     workspace: 'test/fixtures',
     prepare: [
@@ -27,11 +27,15 @@ const specs = [
   }
 ];
 runBenchmark(specs, async ({ suite, spec, dir }) => {
-  const {default: prod} = await import(pathToFileURL(`${dir}/prod.mjs`));
+  // dir: /absolute/path/to/20231230035547807/String#match/test/fixtures
+
   // const {default: prod} = await import(pathToFileURL(`${dir}/test/fixtures/prod.mjs`));
+  const {default: prod} = await import(pathToFileURL(`${dir}/prod.mjs`));
   return () => {
     prod('Hello World!');
   };
 }).then((suite) => {
   console.log('FINISHED');
+}).catch((err) => {
+  console.error(err);
 });
