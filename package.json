@@ -1,20 +1,20 @@
 {
   "name": "@twada/benchmark-commits",
-  "description": "Run benchmark on specified git commits",
   "version": "0.3.1",
+  "description": "Run benchmark on specified git commits",
+  "keywords": [],
+  "homepage": "http://github.com/twada/benchmark-commits",
+  "bugs": "https://github.com/twada/benchmark-commits/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/twada/benchmark-commits.git"
+  },
+  "license": "MIT",
   "author": {
     "name": "Takuto Wada",
     "email": "takuto.wada@gmail.com",
     "url": "https://github.com/twada"
   },
-  "files": [
-    "src",
-    "dist",
-    "!**/__tests__",
-    "CHANGELOG.md",
-    "README.md",
-    "package.json"
-  ],
   "type": "module",
   "exports": {
     ".": {
@@ -31,16 +31,22 @@
   },
   "main": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
-  "publishConfig": {
-    "access": "public"
-  },
-  "keywords": [],
-  "license": "MIT",
-  "homepage": "http://github.com/twada/benchmark-commits",
-  "bugs": "https://github.com/twada/benchmark-commits/issues",
-  "repository": {
-    "type": "git",
-    "url": "http://github.com/twada/benchmark-commits.git"
+  "files": [
+    "src",
+    "dist",
+    "!**/__tests__",
+    "CHANGELOG.md",
+    "README.md",
+    "package.json"
+  ],
+  "scripts": {
+    "preversion": "npm test",
+    "clean": "rimraf dist",
+    "build": "tsc",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "test:unit": "node --enable-source-maps --test \"./dist/__tests__/*test.mjs\"",
+    "test": "npm run clean && npm run lint && npm run build && npm run test:unit"
   },
   "dependencies": {
     "benchmark": "^2.1.4",
@@ -53,13 +59,7 @@
     "rimraf": "^6.0.0",
     "typescript": "^5.7.0"
   },
-  "scripts": {
-    "preversion": "npm test",
-    "clean": "rimraf dist",
-    "build": "tsc",
-    "lint": "eslint src",
-    "lint:fix": "eslint src --fix",
-    "test:unit": "node --enable-source-maps --test \"./dist/__tests__/*test.mjs\"",
-    "test": "npm run clean && npm run lint && npm run build && npm run test:unit"
+  "publishConfig": {
+    "access": "public"
   }
 }
