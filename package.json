@@ -2,7 +2,10 @@
   "name": "@twada/benchmark-commits",
   "version": "0.3.1",
   "description": "Run benchmark on specified git commits",
-  "keywords": [],
+  "keywords": [
+    "benchmark",
+    "git"
+  ],
   "homepage": "http://github.com/twada/benchmark-commits",
   "bugs": "https://github.com/twada/benchmark-commits/issues",
   "repository": {
