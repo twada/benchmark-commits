@@ -1,30 +1,34 @@
-import { runBenchmark } from '../dist/index.mjs';
-import { strict as assert } from 'assert';
-import { createRequire } from 'module';
+import { runBenchmark } from '../index.mjs';
+import { describe, it } from 'node:test';
+import { strict as assert } from 'node:assert';
+import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const shouldNotBeFulfilled = () => {
   assert(false, 'should not be fulfilled');
 };
 class SpyLogger {
+  logCalls: string[];
+  errorCalls: Error[];
+
   constructor () {
     this.logCalls = [];
     this.errorCalls = [];
   }
 
-  log (str) {
+  log (str: string) {
     this.logCalls.push(str);
   }
 
-  error (err) {
+  error (err: Error) {
     this.errorCalls.push(err);
   }
 }
-const sorted = (ary) => {
+const sorted = (ary: string[]): string[] => {
   const a = ary.slice();
   a.sort();
   return a;
 };
-const take = (ary, len) => {
+const take = (ary: string[], len: number): string[] => {
   return ary.splice(0, len);
 };
 

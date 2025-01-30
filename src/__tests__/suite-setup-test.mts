@@ -1,36 +1,65 @@
-import { setupSuite, normalizeSpecs, benchmarkName } from '../dist/suite-setup.mjs';
-import { tmpdir } from 'os';
-import { existsSync, rmSync } from 'fs';
-import { join } from 'path';
-import { strict as assert } from 'assert';
-import { EventEmitter } from 'events';
+import { setupSuite, normalizeSpecs, benchmarkName } from '../suite-setup.mjs';
+import { describe, it, beforeEach, afterEach } from 'node:test';
+import { tmpdir } from 'node:os';
+import { existsSync, rmSync } from 'node:fs';
+import { join } from 'node:path';
+import { strict as assert } from 'node:assert';
+import { EventEmitter } from 'node:events';
+import type { Options as BenchmarkOptions } from 'benchmark';
+import type { BenchmarkSuiteLike, BenchmarkFunction, NormalizedBenchmarkSpec } from '../suite-setup.mjs';
+
 // import { pathToFileURL } from 'node:url';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
-const zf = (n, len = 2) => String(n).padStart(len, '0');
+const zf = (n: number, len = 2) => String(n).padStart(len, '0');
 const timestampString = (d = new Date()) => `${d.getFullYear()}${zf(d.getMonth() + 1)}${zf(d.getDate())}${zf(d.getHours())}${zf(d.getMinutes())}${zf(d.getSeconds())}${zf(d.getMilliseconds(), 3)}`;
+
+type BenchmarkAddCall = {
+  name: string,
+  fn: Function | string,
+  options: BenchmarkOptions | undefined
+};
+type SkipCall = {
+  spec: NormalizedBenchmarkSpec,
+  reason: Error
+};
+
 class FakeBenchmarkSuite extends EventEmitter {
-  constructor (calls) {
+  readonly calls: BenchmarkAddCall[];
+  constructor (calls: BenchmarkAddCall[]) {
     super();
     this.calls = calls;
   }
 
-  add (name, fn, options) {
+  add (name: string, fn: Function | string, options?: BenchmarkOptions) {
     this.calls.push({ name, fn, options });
   }
 
   get length () {
     return this.calls.length;
   }
+  // run (options?: { async: boolean }) {
+  //   assert(false, 'not implemented');
+  // };
+  // get aborted () {
+  //   return false;
+  // }
+  // filter (callback: Function | string) {
+  //   assert(false, 'not implemented');
+  // }
+  // map (callback: Function | string) {
+  //   assert(false, 'not implemented');
+  // }
 }
-const delay = (millis, val) => {
+
+const delay = (millis: number, val: any): Promise<any> => {
   return new Promise((resolve, _reject) => {
     setTimeout(() => {
       resolve(val);
     }, millis);
   });
 };
-const rejectLater = (millis, err) => {
+const rejectLater = (millis: number, err: any): Promise<any> => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       reject(err);
@@ -105,10 +134,10 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
   });
 
   describe('`register` is a benchmark registration function that returns benchmark function. benchmark registration function takes { suite, spec, dir} as arguments.', () => {
-    let targetDir;
-    let addCalls;
-    let setup;
-    let specs;
+    let targetDir: string;
+    let addCalls: BenchmarkAddCall[];
+    let setup: ReturnType<typeof setupSuite>;
+    let specs: NormalizedBenchmarkSpec[];
 
     beforeEach(() => {
       specs = [
@@ -129,7 +158,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
         }
       ];
       addCalls = [];
-      const suite = new FakeBenchmarkSuite(addCalls);
+      const suite: BenchmarkSuiteLike = new FakeBenchmarkSuite(addCalls) as unknown as BenchmarkSuiteLike;
       targetDir = join(tmpdir(), timestampString());
       setup = setupSuite(suite, targetDir);
     });
@@ -171,8 +200,8 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
         };
       }).then((_suite) => {
         assert(addCalls.length === 3);
-        assert(addCalls[0].options.defer === false);
-        assert(addCalls.every((call) => call.options.defer === false));
+        assert(addCalls[0]?.options?.defer === false);
+        assert(addCalls.every((call) => call.options?.defer === false));
       });
     });
 
@@ -187,23 +216,24 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
         };
       }).then((_suite) => {
         assert(addCalls.length === 3);
-        assert(addCalls[0].options.defer === true);
-        assert(addCalls.every((call) => call.options.defer === true));
+        assert(addCalls[0]?.options?.defer === true);
+        assert(addCalls.every((call) => call.options?.defer === true));
       });
     });
 
     it('if benchmark function takes more than one parameter, skip benchmark registration for that `spec` since benchmark function is invalid', () => {
-      const skipCalls = [];
+      const skipCalls: SkipCall[] = [];
       setup.on('skip', (spec, reason) => {
         skipCalls.push({ spec, reason });
       });
       return setup.run(specs, ({ suite: _suite, spec, dir }) => {
         const prod = require(`${dir}/test/fixtures/prod`);
         if (spec.git === 'bench-test-2') {
-          return (deferred, _invalid) => {
+          const invalidFn = (deferred: any, _invalid: any) => {
             prod('Hello World!');
             deferred.resolve();
           };
+          return invalidFn as BenchmarkFunction;
         }
         return (deferred) => {
           prod('Hello World!');
@@ -213,6 +243,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
         assert(addCalls.length === 2);
         assert(skipCalls.length === 1);
         const skipped = skipCalls[0];
+        assert(skipped !== undefined);
         assert.deepEqual(skipped.spec, specs[1]);
         assert.equal(skipped.reason.message, 'Benchmark function shuold have 0 or 1 parameter');
       });
@@ -232,7 +263,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
           prepare: ['npm install']
         }
       ];
-      const skipCalls = [];
+      const skipCalls: SkipCall[] = [];
       setup.on('skip', (spec, reason) => {
         skipCalls.push({ spec, reason });
       });
@@ -244,13 +275,15 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
       }).then((_suite) => {
         assert(addCalls.length === 3);
         assert(skipCalls.length === 2);
+        assert(skipCalls[0] !== undefined);
         assert.deepEqual(skipCalls[0].spec, { name: 'error1', git: 'nonexistent1', prepare: ['npm install'] });
+        assert(skipCalls[1] !== undefined);
         assert.deepEqual(skipCalls[1].spec, { name: 'error2', git: 'nonexistent2', prepare: ['npm install'] });
       });
     });
 
     it('if error occurred while executing registration function, skip benchmark registration for that `spec`', () => {
-      const skipCalls = [];
+      const skipCalls: SkipCall[] = [];
       setup.on('skip', (spec, reason) => {
         skipCalls.push({ spec, reason });
       });
@@ -265,6 +298,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
       }).then((_suite) => {
         assert(addCalls.length === 2);
         assert(skipCalls.length === 1);
+        assert(skipCalls[0] !== undefined);
         assert.deepEqual(skipCalls[0].spec, {
           name: 'String#indexOf',
           git: 'bench-test-2',
@@ -274,7 +308,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
     });
 
     it('if async registration function rejects, skip benchmark registration for that `spec`', () => {
-      const skipCalls = [];
+      const skipCalls: SkipCall[] = [];
       setup.on('skip', (spec, reason) => {
         skipCalls.push({ spec, reason });
       });
@@ -290,6 +324,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
       }).then((_suite) => {
         assert(addCalls.length === 2);
         assert(skipCalls.length === 1);
+        assert(skipCalls[0] !== undefined);
         assert.deepEqual(skipCalls[0].spec, {
           name: 'String#indexOf',
           git: 'bench-test-2',
@@ -299,13 +334,13 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
     });
 
     it('if benchmark registration function does not return function, skip benchmark registration for that `spec`', () => {
-      const skipCalls = [];
+      const skipCalls: SkipCall[] = [];
       setup.on('skip', (spec, reason) => {
         skipCalls.push({ spec, reason });
       });
       return setup.run(specs, ({ suite: _suite, spec, dir }) => {
         if (spec.git === 'bench-test-2') {
-          return 'not a function';
+          return 'not a function' as unknown as BenchmarkFunction;
         }
         const prod = require(`${dir}/test/fixtures/prod`);
         return () => {
@@ -314,6 +349,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
       }).then((_suite) => {
         assert(addCalls.length === 2);
         assert(skipCalls.length === 1);
+        assert(skipCalls[0] !== undefined);
         assert.deepEqual(skipCalls[0].spec, {
           name: 'String#indexOf',
           git: 'bench-test-2',
