@@ -1,29 +1,40 @@
 import { EventEmitter } from 'node:events';
 import { join } from 'node:path';
 import { spawn } from 'node:child_process';
+import { strict as assert } from 'node:assert';
 import { extract } from 'extract-git-treeish';
-import type { Suite, Deferred } from 'benchmark';
+import type { Deferred } from 'benchmark';
 import type { SpawnOptionsWithoutStdio } from 'node:child_process';
 
 type NormalizedBenchmarkSpec = { name: string, git: string, prepare: string[], workspace?: string };
 type BenchmarkSpec = { name: string, git: string, prepare?: string[], workspace?: string };
 type BenchmarkTarget = BenchmarkSpec | string;
 type BenchmarkInstallation = { spec: BenchmarkSpec, dir: string };
-type BenchmarkArguments = { suite: Suite, spec: BenchmarkSpec, dir: string };
+type BenchmarkArguments = { suite: BenchmarkSuiteLike, spec: BenchmarkSpec, dir: string };
 type BenchmarkFunction = (() => void) | ((deferred: Deferred) => void);
 type BenchmarkRegisterFunction = (benchmarkArguments: BenchmarkArguments) => BenchmarkFunction | Promise<BenchmarkFunction>;
 
+type BenchmarkSuiteLike = {
+  add: (name: string, fn: BenchmarkFunction, options: { defer: boolean }) => void;
+  length: number;
+  on: (type?: string, callback?: Function) => BenchmarkSuiteLike;
+  run: (options?: { async: boolean }) => BenchmarkSuiteLike;
+  aborted: boolean;
+  filter: (callback: Function | string) => BenchmarkSuiteLike;
+  map: (callback: Function | string) => any[];
+};
+
 class SuiteSetup extends EventEmitter {
-  readonly suite: Suite;
+  readonly suite: BenchmarkSuiteLike;
   readonly workDir: string;
 
-  constructor (suite: Suite, workDir: string) {
+  constructor (suite: BenchmarkSuiteLike, workDir: string) {
     super();
     this.suite = suite;
     this.workDir = workDir;
   }
 
-  run (specs: NormalizedBenchmarkSpec[], register: BenchmarkRegisterFunction): Promise<Suite> {
+  run (specs: NormalizedBenchmarkSpec[], register: BenchmarkRegisterFunction): Promise<BenchmarkSuiteLike> {
     return runSetup(this, specs, register);
   }
 }
@@ -38,12 +49,13 @@ function spawnPromise (command: string, args: string[], options: SpawnOptionsWit
   });
 }
 
-function parseLine (str: string): { command: string, args: string[] } {
+function parseCommandLine (str: string): { command: string, args: string[] } {
   const tokens = str.split(' ');
+  assert(tokens[0] !== undefined, 'command should not be empty');
   return { command: tokens[0], args: tokens.slice(1) };
 }
 
-function runSetup (setup: SuiteSetup, specs: NormalizedBenchmarkSpec[], register: BenchmarkRegisterFunction): Promise<Suite> {
+function runSetup (setup: SuiteSetup, specs: NormalizedBenchmarkSpec[], register: BenchmarkRegisterFunction): Promise<BenchmarkSuiteLike> {
   const destDir = setup.workDir;
   const suite = setup.suite;
   setup.emit('start', specs);
@@ -56,10 +68,9 @@ function runSetup (setup: SuiteSetup, specs: NormalizedBenchmarkSpec[], register
         const spawnOptions = {
           cwd
         };
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spec.prepare.reduce((promise: Promise<any>, nextCommand: string) => {
           return promise.then(() => {
-            const { command, args } = parseLine(nextCommand);
+            const { command, args } = parseCommandLine(nextCommand);
             return spawnPromise(command, args, spawnOptions);
           });
         }, Promise.resolve()).then(() => {
@@ -78,6 +89,7 @@ function runSetup (setup: SuiteSetup, specs: NormalizedBenchmarkSpec[], register
   return Promise.allSettled(preparations).then(results => {
     specs.forEach((spec, i) => {
       const result = results[i];
+      assert(result !== undefined, 'result should not be undefined');
       if (result.status === 'fulfilled') {
         const fn = result.value;
         if (typeof fn === 'function') {
@@ -131,7 +143,7 @@ function benchmarkName (spec: BenchmarkSpec): string {
   }
 }
 
-function setupSuite (suite: Suite, workDir: string): SuiteSetup {
+function setupSuite (suite: BenchmarkSuiteLike, workDir: string): SuiteSetup {
   return new SuiteSetup(suite, workDir);
 }
 
@@ -139,11 +151,14 @@ export type {
   NormalizedBenchmarkSpec,
   BenchmarkRegisterFunction,
   BenchmarkTarget,
+  BenchmarkFunction,
+  BenchmarkSuiteLike,
   BenchmarkSpec
 };
 
 export {
   setupSuite,
+  parseCommandLine,
   normalizeSpecs,
   benchmarkName
 };
