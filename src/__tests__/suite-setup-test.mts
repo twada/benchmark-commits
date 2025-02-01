@@ -5,10 +5,8 @@ import { existsSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { strict as assert } from 'node:assert';
 import { EventEmitter } from 'node:events';
-import type { Options as BenchmarkOptions } from 'benchmark';
-import type { BenchmarkSuiteLike, BenchmarkFunction, NormalizedBenchmarkSpec } from '../suite-setup.mjs';
-
-// import { pathToFileURL } from 'node:url';
+import type { Suite as BenchmarkSuite, Options as BenchmarkOptions } from 'benchmark';
+import type { BenchmarkFunction, NormalizedBenchmarkSpec } from '../suite-setup.mjs';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const zf = (n: number, len = 2) => String(n).padStart(len, '0');
@@ -38,18 +36,6 @@ class FakeBenchmarkSuite extends EventEmitter {
   get length () {
     return this.calls.length;
   }
-  // run (options?: { async: boolean }) {
-  //   assert(false, 'not implemented');
-  // };
-  // get aborted () {
-  //   return false;
-  // }
-  // filter (callback: Function | string) {
-  //   assert(false, 'not implemented');
-  // }
-  // map (callback: Function | string) {
-  //   assert(false, 'not implemented');
-  // }
 }
 
 const delay = (millis: number, val: any): Promise<any> => {
@@ -158,7 +144,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
         }
       ];
       addCalls = [];
-      const suite: BenchmarkSuiteLike = new FakeBenchmarkSuite(addCalls) as unknown as BenchmarkSuiteLike;
+      const suite: BenchmarkSuite = new FakeBenchmarkSuite(addCalls) as unknown as BenchmarkSuite;
       targetDir = join(tmpdir(), timestampString());
       setup = setupSuite(suite, targetDir);
     });

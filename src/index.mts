@@ -2,7 +2,7 @@ import { join } from 'node:path';
 import { rmSync } from 'node:fs';
 import Benchmark from 'benchmark';
 import { setupSuite, normalizeSpecs, benchmarkName } from './suite-setup.mjs';
-import type { NormalizedBenchmarkSpec, BenchmarkRegisterFunction, BenchmarkSuiteLike, BenchmarkTarget } from './suite-setup.mjs';
+import type { NormalizedBenchmarkSpec, BenchmarkRegisterFunction, BenchmarkTarget } from './suite-setup.mjs';
 
 type BenchmarkLogger = {
   log (str: string): void
@@ -44,7 +44,7 @@ function assertLoggerExists (logger: BenchmarkLogger | undefined): asserts logge
   }
 }
 
-function runBenchmark (commitsOrSpecs: BenchmarkTarget[], register: BenchmarkRegisterFunction, options?: BenchmarkOptions): Promise<BenchmarkSuiteLike> {
+function runBenchmark (commitsOrSpecs: BenchmarkTarget[], register: BenchmarkRegisterFunction, options?: BenchmarkOptions): Promise<Benchmark.Suite> {
   options = Object.assign({
     logger: new ConsoleLogger()
   }, options);
@@ -70,9 +70,9 @@ function runBenchmark (commitsOrSpecs: BenchmarkTarget[], register: BenchmarkReg
   setup.on('skip', (spec: NormalizedBenchmarkSpec, reason: any) => {
     logger.log(`skip benchmark of ${benchmarkName(spec)}, reason: [${reason}]`);
   });
-  return new Promise<BenchmarkSuiteLike>((resolve, reject) => {
+  return new Promise<Benchmark.Suite>((resolve, reject) => {
     const specs = normalizeSpecs(commitsOrSpecs);
-    setup.run(specs, register).then((suite: BenchmarkSuiteLike) => {
+    setup.run(specs, register).then((suite: Benchmark.Suite) => {
       suite.on('abort', function (event: BenchmarkAbortEvent) {
         logger.error(event);
       });
