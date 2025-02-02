@@ -43,7 +43,7 @@
     "package.json"
   ],
   "scripts": {
-    "preversion": "npm test",
+    "example": "node --experimental-strip-types examples/run-async.mts",
     "clean": "rimraf dist",
     "build": "tsc",
     "lint": "eslint src",
