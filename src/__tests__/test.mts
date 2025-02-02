@@ -15,12 +15,12 @@ class SpyLogger {
     this.errorCalls = [];
   }
 
-  log (str: string) {
-    this.logCalls.push(str);
+  log (message?: any, ...optionalParams: any[]): void {
+    this.logCalls.push(message);
   }
 
-  error (err: Error) {
-    this.errorCalls.push(err);
+  error (message?: any, ...optionalParams: any[]): void {
+    this.errorCalls.push(message);
   }
 }
 const sorted = (ary: string[]): string[] => {

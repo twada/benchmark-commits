@@ -2,11 +2,11 @@ import { join } from 'node:path';
 import { rmSync } from 'node:fs';
 import Benchmark from 'benchmark';
 import { setupSuite, normalizeSpecs, benchmarkName } from './suite-setup.mjs';
-import type { NormalizedBenchmarkSpec, BenchmarkRegisterFunction, BenchmarkTarget } from './suite-setup.mjs';
+import type { NormalizedBenchmarkSpec, BenchmarkRegisterFunction, BenchmarkArguments, BenchmarkTarget } from './suite-setup.mjs';
 
 type BenchmarkLogger = {
-  log (str: string): void
-  error (err: any): void
+  log (message?: any, ...optionalParams: any[]): void;
+  error (message?: any, ...optionalParams: any[]): void;
 };
 type BenchmarkAbortEvent = {
   type: string,
@@ -29,12 +29,12 @@ const zf = (n: number, len = 2) => String(n).padStart(len, '0');
 const timestampString = (d = new Date()) => `${d.getFullYear()}${zf(d.getMonth() + 1)}${zf(d.getDate())}${zf(d.getHours())}${zf(d.getMinutes())}${zf(d.getSeconds())}${zf(d.getMilliseconds(), 3)}`;
 
 class ConsoleLogger {
-  log (str: string) {
-    console.log(str);
+  log (message?: any, ...optionalParams: any[]): void {
+    console.log(message, ...optionalParams);
   }
 
-  error (err: any) {
-    console.error(err);
+  error (message?: any, ...optionalParams: any[]): void {
+    console.error(message, ...optionalParams);
   }
 }
 
@@ -108,6 +108,14 @@ function runBenchmark (commitsOrSpecs: BenchmarkTarget[], register: BenchmarkReg
     }).catch((err) => reject(err));
   });
 }
+
+export type {
+  BenchmarkTarget,
+  BenchmarkRegisterFunction,
+  BenchmarkArguments,
+  BenchmarkOptions,
+  BenchmarkLogger,
+};
 
 export {
   runBenchmark

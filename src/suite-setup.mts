@@ -9,8 +9,8 @@ import type { SpawnOptionsWithoutStdio } from 'node:child_process';
 type NormalizedBenchmarkSpec = { name: string, git: string, prepare: string[], workspace?: string };
 type BenchmarkSpec = { name: string, git: string, prepare?: string[], workspace?: string };
 type BenchmarkTarget = BenchmarkSpec | string;
-type BenchmarkInstallation = { spec: BenchmarkSpec, dir: string };
-type BenchmarkArguments = { suite: BenchmarkSuite, spec: BenchmarkSpec, dir: string };
+type BenchmarkInstallation = { spec: NormalizedBenchmarkSpec, dir: string };
+type BenchmarkArguments = { suite: BenchmarkSuite, spec: NormalizedBenchmarkSpec, dir: string };
 type BenchmarkFunction = (() => void) | ((deferred: Deferred) => void);
 type BenchmarkRegisterFunction = (benchmarkArguments: BenchmarkArguments) => BenchmarkFunction | Promise<BenchmarkFunction>;
 
@@ -140,9 +140,9 @@ function setupSuite (suite: BenchmarkSuite, workDir: string): SuiteSetup {
 export type {
   NormalizedBenchmarkSpec,
   BenchmarkRegisterFunction,
+  BenchmarkArguments,
   BenchmarkTarget,
-  BenchmarkFunction,
-  BenchmarkSpec
+  BenchmarkFunction
 };
 
 export {
