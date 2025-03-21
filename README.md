@@ -7,6 +7,7 @@ Run benchmark on specified git commits.
 [![NPM version][npm-image]][npm-url]
 [![Code Style][style-image]][style-url]
 [![License][license-image]][license-url]
+![Supported Node Version](https://img.shields.io/node/v/%40twada%2Fbenchmark-commits)
 
 
 INSTALL
@@ -60,8 +61,8 @@ Licensed under the [MIT](https://twada.mit-license.org) license.
 [npm-url]: https://npmjs.org/package/@twada/benchmark-commits
 [npm-image]: https://badge.fury.io/js/%40twada%2Fbenchmark-commits.svg
 
-[style-url]: https://github.com/standard/semistandard
-[style-image]: https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg
+[style-url]: https://github.com/neostandard/neostandard
+[style-image]: https://img.shields.io/badge/code_style-neostandard-brightgreen?style=flat
 
 [license-url]: https://twada.mit-license.org
 [license-image]: https://img.shields.io/badge/license-MIT-brightgreen.svg
