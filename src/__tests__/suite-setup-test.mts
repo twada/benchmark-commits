@@ -57,7 +57,7 @@ const shouldNotBeFulfilled = () => {
 };
 
 describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commitsOrSpecs`. Each benchmark function is registered via `register` function', () => {
-  describe('`commitsOrSpecs` is an array of either (1) string specifying git tag/branch/commit or (2) object having `name`, `git`, `prepare` and `workspace` properties, pointing to git object to be checked out for the benchmark', () => {
+  describe('`commitsOrSpecs` is an array of either (1) string specifying git tag/branch/commit or (2) object having `name`, `git`, `prepare` and `workdir` properties, pointing to git object to be checked out for the benchmark', () => {
     describe('internally, each item in `commitsOrSpecs` is normalized to `spec` object in {name, git, prepare} form', () => {
       describe('if `commitsOrSpecs` is an array of string specifying git tag/branch/commit', () => {
         describe('converts each string to object in {name, git, prepare} form.', () => {
@@ -75,7 +75,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
           };
           it('name === git in this case.', testBody);
           it('prepare is an array containing default command string ["npm install"]', testBody);
-          it('workspace is undefined', testBody);
+          it('workdir is undefined', testBody);
         });
         it('use git object name as benchmark name', () => {
           const spec = { name: 'bench-test-1', git: 'bench-test-1', prepare: ['npm install'] };
@@ -98,7 +98,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
         };
         it('name and git is used as-is', testBody);
         it('prepare is an array containing default command string ["npm install"]', testBody);
-        it('workspace is undefined', testBody);
+        it('workdir is undefined', testBody);
         it('generated benchmark name is `name(git)`', () => {
           const spec = { name: 'Regex#test', git: 'bench-test-1' };
           assert(benchmarkName(spec) === 'Regex#test(bench-test-1)');
