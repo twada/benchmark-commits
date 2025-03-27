@@ -129,7 +129,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
       });
 
       // - TODO: prepare
-      // - TODO: workspace
+      // - TODO: workdir
     });
   });
 

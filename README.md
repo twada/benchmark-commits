@@ -25,13 +25,13 @@ SPEC
   - if all benchmark executions have finished (at least one benchmark was successful), output benchmark result then resolve with benchmark suite
   - if all benchmark executions have failed, reject with Error
 
-  - `commitsOrSpecs` is an array of either (1) string specifying git tag/branch/commit or (2) object having `name` and `git` properties, pointing to git object to be checked out for the benchmark
-    - internally, each item in `commitsOrSpecs` is normalized to `spec` object in {name, git} form
+  - `commitsOrSpecs` is an array of either (1) string specifying git tag/branch/commit or (2) object having `name`, `git`, `prepare` and `workdir` properties, pointing to git object to be checked out for the benchmark
+    - internally, each item in `commitsOrSpecs` is normalized to `spec` object in {name, git, prepare} form
       - if `commitsOrSpecs` is an array of string specifying git tag/branch/commit
-        - converts each string to {name, git} form. name === git in this case.
+        - converts each string to {name, git, prepare} form. name === git in this case.
         - use git object name as benchmark name
       - if `commitsOrSpecs` is already an array of `spec` object having {name, git} form
-        - use them as `spec` object
+        - use them as `spec` object with default prepare
         - generated benchmark name is `name(git)`
   - `register` is a benchmark registration function that returns benchmark function. benchmark registration function takes { suite, spec, dir} as arguments.
     - if `register` function runs synchronously, register benchmark function immediately
