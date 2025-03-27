@@ -6,8 +6,8 @@ import { extract } from 'extract-git-treeish';
 import type { Suite as BenchmarkSuite, Deferred } from 'benchmark';
 import type { SpawnOptionsWithoutStdio } from 'node:child_process';
 
-type NormalizedBenchmarkSpec = { name: string, git: string, prepare: string[], workspace?: string };
-type BenchmarkSpec = { name: string, git: string, prepare?: string[], workspace?: string };
+type NormalizedBenchmarkSpec = { name: string, git: string, prepare: string[], workdir?: string };
+type BenchmarkSpec = { name: string, git: string, prepare?: string[], workdir?: string };
 type BenchmarkTarget = BenchmarkSpec | string;
 type BenchmarkInstallation = { spec: NormalizedBenchmarkSpec, dir: string };
 type BenchmarkArguments = { suite: BenchmarkSuite, spec: NormalizedBenchmarkSpec, dir: string };
@@ -53,7 +53,7 @@ function runSetup (setup: SuiteSetup, specs: NormalizedBenchmarkSpec[], register
   const preparations = specs.map((spec) => {
     return new Promise<BenchmarkInstallation>((resolve, reject) => {
       extract({ treeIsh: spec.git, dest: join(destDir, spec.name) }).then(({ dir }) => {
-        const cwd = spec.workspace ? join(dir, spec.workspace) : dir;
+        const cwd = spec.workdir ? join(dir, spec.workdir) : dir;
         setup.emit('preparation:start', spec, cwd);
         const spawnOptions = {
           cwd

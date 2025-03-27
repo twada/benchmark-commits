@@ -4,7 +4,7 @@ const specs = [
   {
     name: 'Regex#test',
     git: 'bench-test-1-esm',
-    workspace: 'test/fixtures',
+    workdir: 'test/fixtures',
     prepare: [
       'npm install'
     ]
@@ -12,7 +12,7 @@ const specs = [
   {
     name: 'String#indexOf',
     git: 'bench-test-2-esm',
-    workspace: 'test/fixtures',
+    workdir: 'test/fixtures',
     prepare: [
       'npm install'
     ]
@@ -20,7 +20,7 @@ const specs = [
   {
     name: 'String#match',
     git: 'bench-test-3-esm',
-    workspace: 'test/fixtures',
+    workdir: 'test/fixtures',
     prepare: [
       'npm install'
     ]
