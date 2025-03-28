@@ -136,6 +136,26 @@ function benchmarkName (spec: BenchmarkSpec): string {
   }
 }
 
+function isAsyncFunction (fn: Function): boolean {
+  return fn.constructor && fn.constructor.name === 'AsyncFunction';
+}
+
+function isPromiseReturning (fn: Function): boolean {
+  // AsyncFunction always returns Promise
+  if (isAsyncFunction(fn)) {
+    return true;
+  }
+
+  try {
+    // Test if function returns a Promise-like object by executing it with dummy values
+    const result = fn();
+    return Boolean(result && typeof result.then === 'function');
+  } catch (error) {
+    // If execution fails, assume it's not Promise-returning
+    return false;
+  }
+}
+
 function setupSuite (suite: BenchmarkSuite, workDir: string): SuiteSetup {
   return new SuiteSetup(suite, workDir);
 }
@@ -155,5 +175,7 @@ export {
   setupSuite,
   parseCommandLine,
   normalizeSpecs,
-  benchmarkName
+  benchmarkName,
+  isAsyncFunction,
+  isPromiseReturning
 };

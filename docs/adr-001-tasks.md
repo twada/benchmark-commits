@@ -9,9 +9,9 @@ These tasks track the implementation of the Promise-based async benchmarks featu
   - [x] Define `AsyncBenchmarkFunction` type
   - [x] Define composite `BenchmarkFunction` type
 
-- [ ] Implement utility functions
-  - [ ] Implement `isAsyncFunction` function to detect async functions
-  - [ ] Implement `isPromiseReturning` function to detect functions that return Promises
+- [x] Implement utility functions
+  - [x] Implement `isAsyncFunction` function to detect async functions
+  - [x] Implement `isPromiseReturning` function to detect functions that return Promises
 
 - [ ] Implement Promise wrapper functionality
   - [ ] Create `wrapPromiseBenchmark` function to convert Promise-returning functions to Deferred pattern
