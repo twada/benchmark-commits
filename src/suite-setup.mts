@@ -11,7 +11,10 @@ type BenchmarkSpec = { name: string, git: string, prepare?: string[], workdir?: 
 type BenchmarkTarget = BenchmarkSpec | string;
 type BenchmarkInstallation = { spec: NormalizedBenchmarkSpec, dir: string };
 type BenchmarkArguments = { suite: BenchmarkSuite, spec: NormalizedBenchmarkSpec, dir: string };
-type BenchmarkFunction = (() => void) | ((deferred: Deferred) => void);
+type SyncBenchmarkFunction = () => void;
+type AsyncDeferredFunction = (deferred: Deferred) => void;
+type AsyncBenchmarkFunction = () => Promise<void>;
+type BenchmarkFunction = SyncBenchmarkFunction | AsyncDeferredFunction | AsyncBenchmarkFunction;
 type BenchmarkRegisterFunction = (benchmarkArguments: BenchmarkArguments) => BenchmarkFunction | Promise<BenchmarkFunction>;
 
 class SuiteSetup extends EventEmitter {
@@ -142,6 +145,9 @@ export type {
   BenchmarkRegisterFunction,
   BenchmarkArguments,
   BenchmarkTarget,
+  SyncBenchmarkFunction,
+  AsyncDeferredFunction,
+  AsyncBenchmarkFunction,
   BenchmarkFunction
 };
 
