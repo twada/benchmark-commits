@@ -10,11 +10,17 @@ type NormalizedBenchmarkSpec = { name: string, git: string, prepare: string[], w
 type BenchmarkSpec = { name: string, git: string, prepare?: string[], workdir?: string };
 type BenchmarkTarget = BenchmarkSpec | string;
 type BenchmarkInstallation = { spec: NormalizedBenchmarkSpec, dir: string };
-type BenchmarkArguments = { suite: BenchmarkSuite, spec: NormalizedBenchmarkSpec, dir: string };
 type SyncBenchmarkFunction = () => void;
 type AsyncDeferredFunction = (deferred: Deferred) => void;
 type AsyncBenchmarkFunction = () => Promise<void>;
 type BenchmarkFunction = SyncBenchmarkFunction | AsyncDeferredFunction | AsyncBenchmarkFunction;
+type BenchmarkArguments = {
+  suite: BenchmarkSuite,
+  spec: NormalizedBenchmarkSpec,
+  dir: string,
+  syncBench: (fn: SyncBenchmarkFunction) => BenchmarkFunction,
+  asyncBench: (fn: AsyncBenchmarkFunction) => BenchmarkFunction
+};
 type BenchmarkRegisterFunction = (benchmarkArguments: BenchmarkArguments) => BenchmarkFunction | Promise<BenchmarkFunction>;
 
 class SuiteSetup extends EventEmitter {
@@ -75,7 +81,13 @@ function runSetup (setup: SuiteSetup, specs: NormalizedBenchmarkSpec[], register
   }).map((installation) => {
     return installation.then(({ spec, dir }: BenchmarkInstallation) => {
       setup.emit('register', spec, dir);
-      return register({ suite, spec, dir });
+      const syncBench = (fn: SyncBenchmarkFunction): BenchmarkFunction => {
+        return fn;
+      };
+      const asyncBench = (fn: AsyncBenchmarkFunction): BenchmarkFunction => {
+        return wrapPromiseBenchmark(fn);
+      };
+      return register({ suite, spec, dir, syncBench, asyncBench });
     });
   });
 

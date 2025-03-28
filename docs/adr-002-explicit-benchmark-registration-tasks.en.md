@@ -4,16 +4,16 @@ These tasks track the implementation of the explicit benchmark registration inte
 
 ## Tasks
 
-- [ ] Update type definitions
-  - [ ] Define `SyncBenchmarkFunction` type
-  - [ ] Define `AsyncBenchmarkFunction` type
-  - [ ] Update `BenchmarkArguments` interface to include `syncBench` and `asyncBench`
-  - [ ] Update `BenchmarkRegisterFunction` type
+- [x] Update type definitions
+  - [x] Define `SyncBenchmarkFunction` type (already existed)
+  - [x] Define `AsyncBenchmarkFunction` type (already existed)
+  - [x] Update `BenchmarkArguments` interface to include `syncBench` and `asyncBench`
+  - [x] Update `BenchmarkRegisterFunction` type (already matched requirements)
 
-- [ ] Implement registration functions
-  - [ ] Implement `syncBench` function
-  - [ ] Implement `asyncBench` function
-  - [ ] Add proper error handling for `asyncBench`
+- [x] Implement registration functions
+  - [x] Implement `syncBench` function
+  - [x] Implement `asyncBench` function
+  - [x] Add proper error handling for `asyncBench` (using existing `wrapPromiseBenchmark` implementation)
 
 - [ ] Update core benchmark execution logic
   - [ ] Modify task execution to use the new explicit registration functions
