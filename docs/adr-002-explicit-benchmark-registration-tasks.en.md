@@ -8,22 +8,25 @@ These tasks track the implementation of the explicit benchmark registration inte
   - [x] Define `SyncBenchmarkFunction` type (already existed)
   - [x] Define `AsyncBenchmarkFunction` type (already existed)
   - [x] Update `BenchmarkArguments` interface to include `syncBench` and `asyncBench`
-  - [x] Update `BenchmarkRegisterFunction` type (already matched requirements)
+  - [x] Update `BenchmarkRegisterFunction` type
+  - [x] Define return type for `syncBench` and `asyncBench` with explicit metadata
 
 - [x] Implement registration functions
-  - [x] Implement `syncBench` function
-  - [x] Implement `asyncBench` function
+  - [x] Implement `syncBench` function to return `{ async: false, fn: SyncBenchmarkFunction }` 
+  - [x] Implement `asyncBench` function to return `{ async: true, fn: AsyncBenchmarkFunction }` 
   - [x] Add proper error handling for `asyncBench` (using existing `wrapPromiseBenchmark` implementation)
 
-- [ ] Update core benchmark execution logic
-  - [ ] Modify task execution to use the new explicit registration functions
-  - [ ] Remove support for direct function returns
-  - [ ] Remove support for Deferred pattern
-  - [ ] Ensure proper error propagation
+- [x] Update core benchmark execution logic
+  - [x] Modify execution to detect benchmark type based on returned value metadata (`async` flag)
+  - [x] Remove function parameter counting logic (`fn.length` checks)
+  - [x] Remove support for direct function returns
+  - [x] Remove support for Deferred pattern
+  - [x] Ensure proper error propagation
 
 - [ ] Update tests
-  - [ ] Add tests for `syncBench` function
-  - [ ] Add tests for `asyncBench` function
+  - [ ] Add tests for `syncBench` function and its return value
+  - [ ] Add tests for `asyncBench` function and its return value
+  - [ ] Test detection of benchmark type based on metadata
   - [ ] Update existing tests to use the new API
   - [ ] Test error handling in asynchronous benchmarks
 

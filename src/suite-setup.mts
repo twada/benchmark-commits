@@ -14,14 +14,17 @@ type SyncBenchmarkFunction = () => void;
 type AsyncDeferredFunction = (deferred: Deferred) => void;
 type AsyncBenchmarkFunction = () => Promise<void>;
 type BenchmarkFunction = SyncBenchmarkFunction | AsyncDeferredFunction | AsyncBenchmarkFunction;
+type SyncBenchmarkRegistration = { async: false, fn: SyncBenchmarkFunction };
+type AsyncBenchmarkRegistration = { async: true, fn: AsyncBenchmarkFunction };
+type BenchmarkRegistration = SyncBenchmarkRegistration | AsyncBenchmarkRegistration;
 type BenchmarkArguments = {
   suite: BenchmarkSuite,
   spec: NormalizedBenchmarkSpec,
   dir: string,
-  syncBench: (fn: SyncBenchmarkFunction) => BenchmarkFunction,
-  asyncBench: (fn: AsyncBenchmarkFunction) => BenchmarkFunction
+  syncBench: (fn: SyncBenchmarkFunction) => SyncBenchmarkRegistration,
+  asyncBench: (fn: AsyncBenchmarkFunction) => AsyncBenchmarkRegistration
 };
-type BenchmarkRegisterFunction = (benchmarkArguments: BenchmarkArguments) => BenchmarkFunction | Promise<BenchmarkFunction>;
+type BenchmarkRegisterFunction = (benchmarkArguments: BenchmarkArguments) => BenchmarkRegistration | Promise<BenchmarkRegistration>;
 
 class SuiteSetup extends EventEmitter {
   readonly suite: BenchmarkSuite;
@@ -81,11 +84,11 @@ function runSetup (setup: SuiteSetup, specs: NormalizedBenchmarkSpec[], register
   }).map((installation) => {
     return installation.then(({ spec, dir }: BenchmarkInstallation) => {
       setup.emit('register', spec, dir);
-      const syncBench = (fn: SyncBenchmarkFunction): BenchmarkFunction => {
-        return fn;
+      const syncBench = (fn: SyncBenchmarkFunction): SyncBenchmarkRegistration => {
+        return { async: false, fn };
       };
-      const asyncBench = (fn: AsyncBenchmarkFunction): BenchmarkFunction => {
-        return wrapPromiseBenchmark(fn);
+      const asyncBench = (fn: AsyncBenchmarkFunction): AsyncBenchmarkRegistration => {
+        return { async: true, fn };
       };
       return register({ suite, spec, dir, syncBench, asyncBench });
     });
@@ -96,26 +99,18 @@ function runSetup (setup: SuiteSetup, specs: NormalizedBenchmarkSpec[], register
       const result = results[i];
       assert(result !== undefined, 'result should not be undefined');
       if (result.status === 'fulfilled') {
-        const fn = result.value;
-        if (typeof fn === 'function') {
-          // Check if function is a Promise-returning function with no parameters
-          if (fn.length === 0) {
-            if (isPromiseReturning(fn)) {
-              // If it returns a Promise, wrap it to work with Deferred pattern
-              const wrappedFn = wrapPromiseBenchmark(fn as AsyncBenchmarkFunction);
-              suite.add(benchmarkName(spec), wrappedFn, { defer: true });
-            } else {
-              // Regular synchronous function
-              suite.add(benchmarkName(spec), fn, { defer: false });
-            }
-          } else if (fn.length === 1) {
-            // Traditional Deferred pattern with one parameter
-            suite.add(benchmarkName(spec), fn, { defer: true });
+        const registration = result.value;
+        if (registration && typeof registration === 'object' && 'async' in registration && 'fn' in registration) {
+          if (registration.async) {
+            // Async benchmark
+            const wrappedFn = wrapPromiseBenchmark(registration.fn as AsyncBenchmarkFunction);
+            suite.add(benchmarkName(spec), wrappedFn, { defer: true });
           } else {
-            setup.emit('skip', spec, new Error('Benchmark function should have 0 or 1 parameter'));
+            // Sync benchmark
+            suite.add(benchmarkName(spec), registration.fn, { defer: false });
           }
         } else {
-          setup.emit('skip', spec, new TypeError('Benchmark registration function should return function'));
+          setup.emit('skip', spec, new TypeError('Benchmark registration function should return a valid registration object'));
         }
       } else if (result.status === 'rejected') {
         setup.emit('skip', spec, result.reason);
@@ -218,7 +213,10 @@ export type {
   SyncBenchmarkFunction,
   AsyncDeferredFunction,
   AsyncBenchmarkFunction,
-  BenchmarkFunction
+  BenchmarkFunction,
+  SyncBenchmarkRegistration,
+  AsyncBenchmarkRegistration,
+  BenchmarkRegistration
 };
 
 export {
