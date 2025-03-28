@@ -156,6 +156,38 @@ function isPromiseReturning (fn: Function): boolean {
   }
 }
 
+function wrapPromiseBenchmark (fn: AsyncBenchmarkFunction): AsyncDeferredFunction {
+  return function (deferred: Deferred) {
+    try {
+      fn().then(() => {
+        deferred.resolve();
+      }).catch(err => {
+        console.error('Benchmark error:', err);
+        // Using any here because the Benchmark.js typings don't fully expose the abort method
+        const benchmark = (deferred as any).benchmark;
+        if (benchmark && typeof benchmark.abort === 'function') {
+          benchmark.abort();
+        } else {
+          // Fallback if abort is not available
+          deferred.resolve();
+          throw new Error('Could not abort benchmark due to Promise rejection');
+        }
+      });
+    } catch (err) {
+      console.error('Benchmark execution error:', err);
+      // Using any here because the Benchmark.js typings don't fully expose the abort method
+      const benchmark = (deferred as any).benchmark;
+      if (benchmark && typeof benchmark.abort === 'function') {
+        benchmark.abort();
+      } else {
+        // Fallback if abort is not available
+        deferred.resolve();
+        throw new Error('Could not abort benchmark due to synchronous error');
+      }
+    }
+  };
+}
+
 function setupSuite (suite: BenchmarkSuite, workDir: string): SuiteSetup {
   return new SuiteSetup(suite, workDir);
 }
@@ -177,5 +209,6 @@ export {
   normalizeSpecs,
   benchmarkName,
   isAsyncFunction,
-  isPromiseReturning
+  isPromiseReturning,
+  wrapPromiseBenchmark
 };

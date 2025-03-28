@@ -13,10 +13,10 @@ These tasks track the implementation of the Promise-based async benchmarks featu
   - [x] Implement `isAsyncFunction` function to detect async functions
   - [x] Implement `isPromiseReturning` function to detect functions that return Promises
 
-- [ ] Implement Promise wrapper functionality
-  - [ ] Create `wrapPromiseBenchmark` function to convert Promise-returning functions to Deferred pattern
-  - [ ] Add proper error handling with `deferred.benchmark.abort()`
-  - [ ] Support both synchronous and asynchronous errors
+- [x] Implement Promise wrapper functionality
+  - [x] Create `wrapPromiseBenchmark` function to convert Promise-returning functions to Deferred pattern
+  - [x] Add proper error handling with `deferred.benchmark.abort()`
+  - [x] Support both synchronous and asynchronous errors
 
 - [ ] Update core benchmark execution logic
   - [ ] Modify task execution to detect and handle Promise-returning functions
