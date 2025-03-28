@@ -245,7 +245,7 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
         const skipped = skipCalls[0];
         assert(skipped !== undefined);
         assert.deepEqual(skipped.spec, specs[1]);
-        assert.equal(skipped.reason.message, 'Benchmark function shuold have 0 or 1 parameter');
+        assert.equal(skipped.reason.message, 'Benchmark function should have 0 or 1 parameter');
       });
     });
 

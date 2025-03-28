@@ -23,15 +23,15 @@ These tasks track the implementation of the Promise-based async benchmarks featu
   - [x] Maintain backward compatibility with Deferred pattern
   - [x] Ensure proper error propagation
 
-- [ ] Add tests
-  - [ ] Test synchronous benchmarks still work
-  - [ ] Test async functions with Promise return
-  - [ ] Test error handling in Promise-based benchmarks
-  - [ ] Test backward compatibility with Deferred pattern
+- [x] Add tests
+  - [x] Test synchronous benchmarks still work
+  - [x] Test async functions with Promise return
+  - [x] Test error handling in Promise-based benchmarks
+  - [x] Test backward compatibility with Deferred pattern
 
-- [ ] Update examples
-  - [ ] Create example for Promise-based async benchmarks
-  - [ ] Update existing examples to show both patterns
+- [x] Update examples
+  - [x] Create example for Promise-based async benchmarks
+  - [x] Update existing examples to show both patterns
 
 - [ ] Update documentation
   - [ ] Update README with new Promise-based pattern examples
