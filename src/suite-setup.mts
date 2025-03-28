@@ -11,7 +11,10 @@ type BenchmarkSpec = { name: string, git: string, prepare?: string[], workdir?: 
 type BenchmarkTarget = BenchmarkSpec | string;
 type BenchmarkInstallation = { spec: NormalizedBenchmarkSpec, dir: string };
 type BenchmarkArguments = { suite: BenchmarkSuite, spec: NormalizedBenchmarkSpec, dir: string };
-type BenchmarkFunction = (() => void) | ((deferred: Deferred) => void);
+type SyncBenchmarkFunction = () => void;
+type AsyncDeferredFunction = (deferred: Deferred) => void;
+type AsyncBenchmarkFunction = () => Promise<void>;
+type BenchmarkFunction = SyncBenchmarkFunction | AsyncDeferredFunction | AsyncBenchmarkFunction;
 type BenchmarkRegisterFunction = (benchmarkArguments: BenchmarkArguments) => BenchmarkFunction | Promise<BenchmarkFunction>;
 
 class SuiteSetup extends EventEmitter {
@@ -83,15 +86,21 @@ function runSetup (setup: SuiteSetup, specs: NormalizedBenchmarkSpec[], register
       if (result.status === 'fulfilled') {
         const fn = result.value;
         if (typeof fn === 'function') {
-          switch (fn.length) {
-            case 0:
+          // Check if function is a Promise-returning function with no parameters
+          if (fn.length === 0) {
+            if (isPromiseReturning(fn)) {
+              // If it returns a Promise, wrap it to work with Deferred pattern
+              const wrappedFn = wrapPromiseBenchmark(fn as AsyncBenchmarkFunction);
+              suite.add(benchmarkName(spec), wrappedFn, { defer: true });
+            } else {
+              // Regular synchronous function
               suite.add(benchmarkName(spec), fn, { defer: false });
-              break;
-            case 1:
-              suite.add(benchmarkName(spec), fn, { defer: true });
-              break;
-            default:
-              setup.emit('skip', spec, new Error('Benchmark function shuold have 0 or 1 parameter'));
+            }
+          } else if (fn.length === 1) {
+            // Traditional Deferred pattern with one parameter
+            suite.add(benchmarkName(spec), fn, { defer: true });
+          } else {
+            setup.emit('skip', spec, new Error('Benchmark function should have 0 or 1 parameter'));
           }
         } else {
           setup.emit('skip', spec, new TypeError('Benchmark registration function should return function'));
@@ -133,6 +142,58 @@ function benchmarkName (spec: BenchmarkSpec): string {
   }
 }
 
+function isAsyncFunction (fn: Function): boolean {
+  return fn.constructor && fn.constructor.name === 'AsyncFunction';
+}
+
+function isPromiseReturning (fn: Function): boolean {
+  // AsyncFunction always returns Promise
+  if (isAsyncFunction(fn)) {
+    return true;
+  }
+
+  try {
+    // Test if function returns a Promise-like object by executing it with dummy values
+    const result = fn();
+    return Boolean(result && typeof result.then === 'function');
+  } catch (error) {
+    // If execution fails, assume it's not Promise-returning
+    return false;
+  }
+}
+
+function wrapPromiseBenchmark (fn: AsyncBenchmarkFunction): AsyncDeferredFunction {
+  return function (deferred: Deferred) {
+    try {
+      fn().then(() => {
+        deferred.resolve();
+      }).catch(err => {
+        console.error('Benchmark error:', err);
+        // Using any here because the Benchmark.js typings don't fully expose the abort method
+        const benchmark = (deferred as any).benchmark;
+        if (benchmark && typeof benchmark.abort === 'function') {
+          benchmark.abort();
+        } else {
+          // Fallback if abort is not available
+          deferred.resolve();
+          throw new Error('Could not abort benchmark due to Promise rejection');
+        }
+      });
+    } catch (err) {
+      console.error('Benchmark execution error:', err);
+      // Using any here because the Benchmark.js typings don't fully expose the abort method
+      const benchmark = (deferred as any).benchmark;
+      if (benchmark && typeof benchmark.abort === 'function') {
+        benchmark.abort();
+      } else {
+        // Fallback if abort is not available
+        deferred.resolve();
+        throw new Error('Could not abort benchmark due to synchronous error');
+      }
+    }
+  };
+}
+
 function setupSuite (suite: BenchmarkSuite, workDir: string): SuiteSetup {
   return new SuiteSetup(suite, workDir);
 }
@@ -142,6 +203,9 @@ export type {
   BenchmarkRegisterFunction,
   BenchmarkArguments,
   BenchmarkTarget,
+  SyncBenchmarkFunction,
+  AsyncDeferredFunction,
+  AsyncBenchmarkFunction,
   BenchmarkFunction
 };
 
@@ -149,5 +213,8 @@ export {
   setupSuite,
   parseCommandLine,
   normalizeSpecs,
-  benchmarkName
+  benchmarkName,
+  isAsyncFunction,
+  isPromiseReturning,
+  wrapPromiseBenchmark
 };

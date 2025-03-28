@@ -17,6 +17,58 @@ INSTALL
 $ npm install @twada/benchmark-commits
 ```
 
+USAGE
+---------------------------------------
+
+### Synchronous Benchmark
+
+```javascript
+import { runBenchmark } from '@twada/benchmark-commits';
+
+runBenchmark(specs, ({ suite, spec, dir }) => {
+  return () => {
+    // Synchronous operation
+    someOperation();
+  };
+});
+```
+
+### Asynchronous Benchmark (Promise-based pattern)
+
+```javascript
+import { runBenchmark } from '@twada/benchmark-commits';
+
+runBenchmark(specs, ({ suite, spec, dir }) => {
+  // Return a function that returns a Promise
+  return async () => {
+    // Using modern async/await syntax
+    const result = await asyncOperation();
+    // Process result...
+    // Errors are automatically handled
+  };
+});
+```
+
+### Asynchronous Benchmark (Traditional Deferred pattern)
+
+```javascript
+import { runBenchmark } from '@twada/benchmark-commits';
+
+runBenchmark(specs, ({ suite, spec, dir }) => {
+  // Return a function that accepts a deferred object
+  return (deferred) => {
+    asyncOperation().then(() => {
+      // Processing...
+      deferred.resolve();
+    }).catch(err => {
+      console.error(err);
+      // Abort the benchmark on error
+      deferred.benchmark.abort();
+    });
+  };
+});
+```
+
 
 SPEC
 ---------------------------------------
@@ -36,8 +88,11 @@ SPEC
   - `register` is a benchmark registration function that returns benchmark function. benchmark registration function takes { suite, spec, dir} as arguments.
     - if `register` function runs synchronously, register benchmark function immediately
     - if `register` function is an async function or returns Promise, register benchmark function asynchronously
-    - benchmark function (a function returned from `register` function) with no parameters will be executed synchronously
-    - if benchmark function takes one parameter, it means that the benchmark function is intended to run asynchronously, so register it as deferred function
+    - benchmark function can be one of three types:
+      - **Synchronous function** `() => void`: A function with no parameters that runs synchronously
+      - **Deferred pattern function** `(deferred) => void`: A function with one parameter that resolves the deferred when the async operation completes
+      - **Promise-returning function** `() => Promise<void>`: A function that returns a Promise which resolves when the async operation completes
+    - For Promise-returning functions, errors are properly handled and will abort the benchmark
     - if benchmark function takes more than one parameter, skip benchmark registration for that `spec` since benchmark function is invalid
     - if git commit object in `commitsOrSpecs` does not exist in underlying git repository, skip benchmark registration for that `spec`
     - if error occurred while executing registration function, skip benchmark registration for that `spec`
