@@ -4,10 +4,10 @@ These tasks track the implementation of the Promise-based async benchmarks featu
 
 ## Tasks
 
-- [ ] Create type definitions for benchmark functions
-  - [ ] Define `SyncBenchmarkFunction` type
-  - [ ] Define `AsyncBenchmarkFunction` type
-  - [ ] Define composite `BenchmarkFunction` type
+- [x] Create type definitions for benchmark functions
+  - [x] Define `SyncBenchmarkFunction` type
+  - [x] Define `AsyncBenchmarkFunction` type
+  - [x] Define composite `BenchmarkFunction` type
 
 - [ ] Implement utility functions
   - [ ] Implement `isAsyncFunction` function to detect async functions
