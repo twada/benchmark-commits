@@ -86,15 +86,21 @@ function runSetup (setup: SuiteSetup, specs: NormalizedBenchmarkSpec[], register
       if (result.status === 'fulfilled') {
         const fn = result.value;
         if (typeof fn === 'function') {
-          switch (fn.length) {
-            case 0:
+          // Check if function is a Promise-returning function with no parameters
+          if (fn.length === 0) {
+            if (isPromiseReturning(fn)) {
+              // If it returns a Promise, wrap it to work with Deferred pattern
+              const wrappedFn = wrapPromiseBenchmark(fn as AsyncBenchmarkFunction);
+              suite.add(benchmarkName(spec), wrappedFn, { defer: true });
+            } else {
+              // Regular synchronous function
               suite.add(benchmarkName(spec), fn, { defer: false });
-              break;
-            case 1:
-              suite.add(benchmarkName(spec), fn, { defer: true });
-              break;
-            default:
-              setup.emit('skip', spec, new Error('Benchmark function shuold have 0 or 1 parameter'));
+            }
+          } else if (fn.length === 1) {
+            // Traditional Deferred pattern with one parameter
+            suite.add(benchmarkName(spec), fn, { defer: true });
+          } else {
+            setup.emit('skip', spec, new Error('Benchmark function should have 0 or 1 parameter'));
           }
         } else {
           setup.emit('skip', spec, new TypeError('Benchmark registration function should return function'));

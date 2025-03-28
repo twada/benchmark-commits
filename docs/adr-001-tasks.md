@@ -18,10 +18,10 @@ These tasks track the implementation of the Promise-based async benchmarks featu
   - [x] Add proper error handling with `deferred.benchmark.abort()`
   - [x] Support both synchronous and asynchronous errors
 
-- [ ] Update core benchmark execution logic
-  - [ ] Modify task execution to detect and handle Promise-returning functions
-  - [ ] Maintain backward compatibility with Deferred pattern
-  - [ ] Ensure proper error propagation
+- [x] Update core benchmark execution logic
+  - [x] Modify task execution to detect and handle Promise-returning functions
+  - [x] Maintain backward compatibility with Deferred pattern
+  - [x] Ensure proper error propagation
 
 - [ ] Add tests
   - [ ] Test synchronous benchmarks still work
