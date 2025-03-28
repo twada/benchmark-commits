@@ -33,7 +33,7 @@ These tasks track the implementation of the Promise-based async benchmarks featu
   - [x] Create example for Promise-based async benchmarks
   - [x] Update existing examples to show both patterns
 
-- [ ] Update documentation
-  - [ ] Update README with new Promise-based pattern examples
-  - [ ] Document error handling behavior
-  - [ ] Update API documentation
+- [x] Update documentation
+  - [x] Update README with new Promise-based pattern examples
+  - [x] Document error handling behavior
+  - [x] Update API documentation
