@@ -30,10 +30,10 @@ These tasks track the implementation of the explicit benchmark registration inte
   - [x] Update existing tests to use the new API
   - [x] Test error handling in asynchronous benchmarks
 
-- [ ] Update examples
-  - [ ] Update synchronous benchmark examples
-  - [ ] Update asynchronous benchmark examples
-  - [ ] Add migration examples from old API to new API
+- [x] Update examples
+  - [x] Update synchronous benchmark examples
+  - [x] Update asynchronous benchmark examples
+  - [x] Add migration examples from old API to new API
 
 - [ ] Update documentation
   - [ ] Update README.md with new API examples
