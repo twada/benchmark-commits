@@ -35,12 +35,12 @@ These tasks track the implementation of the explicit benchmark registration inte
   - [x] Update asynchronous benchmark examples
   - [x] Add migration examples from old API to new API
 
-- [ ] Update documentation
-  - [ ] Update README.md with new API examples
-  - [ ] Create migration guide
-  - [ ] Document breaking changes
-  - [ ] Update API documentation
+- [x] Update documentation
+  - [x] Update README.md with new API examples
+  - [x] Create migration guide
+  - [x] Document breaking changes
+  - [x] Update API documentation
 
-- [ ] Version management
-  - [ ] Update package.json for major version increment
-  - [ ] Update CHANGELOG.md to document breaking changes
+- [x] Version management
+  - [ ] Update package.json for version increment (will be handled by maintainer)
+  - [x] Update CHANGELOG.md to document breaking changes
