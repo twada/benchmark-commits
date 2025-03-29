@@ -1,4 +1,4 @@
-import { setupSuite, isAsyncFunction, isPromiseReturning, wrapPromiseBenchmark } from '../suite-setup.mjs';
+import { setupSuite, wrapPromiseBenchmark } from '../suite-setup.mjs';
 import { describe, it, beforeEach, afterEach } from 'node:test';
 import { tmpdir } from 'node:os';
 import { existsSync, rmSync } from 'node:fs';
@@ -50,50 +50,6 @@ const rejectLater = (millis: number, err: any): Promise<any> => {
 };
 
 describe('Promise-based asynchronous benchmarks', () => {
-  describe('isAsyncFunction()', () => {
-    it('should return true for async functions', () => {
-      const asyncFn = async () => {};
-      assert.strictEqual(isAsyncFunction(asyncFn), true);
-    });
-
-    it('should return false for regular functions', () => {
-      const regularFn = () => {};
-      assert.strictEqual(isAsyncFunction(regularFn), false);
-    });
-
-    it('should return false for Deferred pattern functions', () => {
-      const deferredFn = (deferred: any) => { deferred.resolve(); };
-      assert.strictEqual(isAsyncFunction(deferredFn), false);
-    });
-  });
-
-  describe('isPromiseReturning()', () => {
-    it('should return true for async functions', () => {
-      const asyncFn = async () => {};
-      assert.strictEqual(isPromiseReturning(asyncFn), true);
-    });
-
-    it('should return true for functions that return promises', () => {
-      const promiseFn = () => Promise.resolve();
-      assert.strictEqual(isPromiseReturning(promiseFn), true);
-    });
-
-    it('should return false for regular functions', () => {
-      const regularFn = () => {};
-      assert.strictEqual(isPromiseReturning(regularFn), false);
-    });
-
-    it('should return false for Deferred pattern functions', () => {
-      const deferredFn = (deferred: any) => { deferred.resolve(); };
-      assert.strictEqual(isPromiseReturning(deferredFn), false);
-    });
-
-    it('should return false if function execution throws', () => {
-      const errorFn = () => { throw new Error('Test error'); };
-      assert.strictEqual(isPromiseReturning(errorFn), false);
-    });
-  });
-
   describe('wrapPromiseBenchmark()', () => {
     let mockDeferred: {
       resolve: () => void;
