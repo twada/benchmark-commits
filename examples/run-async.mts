@@ -1,7 +1,7 @@
 // node --experimental-strip-types run-async.mts
 import { pathToFileURL } from 'url';
 import { runBenchmark } from '../dist/index.mjs';
-import type { BenchmarkArguments, BenchmarkTarget, SyncBenchmarkFunction } from '../dist/index.mjs';
+import type { BenchmarkArguments, BenchmarkTarget } from '../dist/index.mjs';
 const specs: BenchmarkTarget[] = [
   {
     name: 'Regex#test',
