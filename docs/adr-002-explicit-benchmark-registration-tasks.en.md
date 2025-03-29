@@ -23,12 +23,12 @@ These tasks track the implementation of the explicit benchmark registration inte
   - [x] Remove support for Deferred pattern
   - [x] Ensure proper error propagation
 
-- [ ] Update tests
-  - [ ] Add tests for `syncBench` function and its return value
-  - [ ] Add tests for `asyncBench` function and its return value
-  - [ ] Test detection of benchmark type based on metadata
-  - [ ] Update existing tests to use the new API
-  - [ ] Test error handling in asynchronous benchmarks
+- [x] Update tests
+  - [x] Add tests for `syncBench` function and its return value
+  - [x] Add tests for `asyncBench` function and its return value
+  - [x] Test detection of benchmark type based on metadata
+  - [x] Update existing tests to use the new API
+  - [x] Test error handling in asynchronous benchmarks
 
 - [ ] Update examples
   - [ ] Update synchronous benchmark examples

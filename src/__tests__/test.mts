@@ -60,11 +60,11 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
     const config = {
       logger: spyLogger
     };
-    return runBenchmark(specs, ({ suite: _suite, spec: _spec, dir }) => {
+    return runBenchmark(specs, ({ suite: _suite, spec: _spec, dir, syncBench }) => {
       const prod = require(`${dir}/test/fixtures/prod`);
-      return () => {
+      return syncBench(() => {
         prod('Hello World!');
-      };
+      });
     }, config).then((suite) => {
       assert(suite.length === 3);
       assert(suite.aborted === false);
@@ -103,11 +103,11 @@ describe('runBenchmark(commitsOrSpecs, register): run benchmark for given `commi
     const config = {
       logger: spyLogger
     };
-    return runBenchmark(specs, ({ suite: _suite, spec, dir }) => {
+    return runBenchmark(specs, ({ suite: _suite, spec, dir, syncBench }) => {
       require(`${dir}/test/fixtures/prod`);
-      return () => {
+      return syncBench(() => {
         throw new Error(`execution error ${spec.git}`);
-      };
+      });
     }, config).then(shouldNotBeFulfilled, (err) => {
       const logs = spyLogger.logCalls;
       assert(logs.shift() === 'start preparation of 2 benchmarks');
