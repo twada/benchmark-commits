@@ -13,7 +13,6 @@ type BenchmarkInstallation = { spec: NormalizedBenchmarkSpec, dir: string };
 type SyncBenchmarkFunction = () => void;
 type AsyncDeferredFunction = (deferred: Deferred) => void;
 type AsyncBenchmarkFunction = () => Promise<void>;
-type BenchmarkFunction = SyncBenchmarkFunction | AsyncDeferredFunction | AsyncBenchmarkFunction;
 type SyncBenchmarkRegistration = { async: false, fn: SyncBenchmarkFunction };
 type AsyncBenchmarkRegistration = { async: true, fn: AsyncBenchmarkFunction };
 type BenchmarkRegistration = SyncBenchmarkRegistration | AsyncBenchmarkRegistration;
@@ -213,7 +212,6 @@ export type {
   SyncBenchmarkFunction,
   AsyncDeferredFunction,
   AsyncBenchmarkFunction,
-  BenchmarkFunction,
   SyncBenchmarkRegistration,
   AsyncBenchmarkRegistration,
   BenchmarkRegistration
