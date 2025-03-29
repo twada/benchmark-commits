@@ -42,5 +42,4 @@ These tasks track the implementation of the explicit benchmark registration inte
   - [x] Update API documentation
 
 - [x] Version management
-  - [ ] Update package.json for version increment (will be handled by maintainer)
   - [x] Update CHANGELOG.md to document breaking changes
