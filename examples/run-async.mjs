@@ -26,14 +26,14 @@ const specs = [
     ]
   }
 ];
-runBenchmark(specs, async ({ suite, spec, dir }) => {
+runBenchmark(specs, async ({ suite, spec, dir, syncBench }) => {
   // dir: /absolute/path/to/20231230035547807/String#match/test/fixtures
 
   // const {default: prod} = await import(pathToFileURL(`${dir}/test/fixtures/prod.mjs`));
   const {default: prod} = await import(pathToFileURL(`${dir}/prod.mjs`));
-  return () => {
+  return syncBench(() => {
     prod('Hello World!');
-  };
+  });
 }).then((suite) => {
   console.log('FINISHED');
 }).catch((err) => {

@@ -1,3 +1,18 @@
+## [0.4.0](http://github.com/twada/benchmark-commits/releases/tag/v0.4.0) (2025-03-29)
+
+
+### Features
+
+* Implement explicit benchmark registration interface ([ADR-002](./docs/adr-002-explicit-benchmark-registration.en.md))
+  * Added explicit `syncBench` and `asyncBench` functions to register benchmark functions
+  * Updated all examples and documentation
+  * Added migration guide
+
+### BREAKING CHANGES
+
+* Removed support for direct function returns
+* Removed support for Deferred pattern
+
 ### [0.3.1](http://github.com/twada/benchmark-commits/releases/tag/v0.3.1) (2023-12-30)
 
 

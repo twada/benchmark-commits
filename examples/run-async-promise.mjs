@@ -31,17 +31,16 @@ const specs = [
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Example using Promise-based asynchronous benchmarks
-runBenchmark(specs, async ({ suite, spec, dir }) => {
+runBenchmark(specs, async ({ suite, spec, dir, asyncBench }) => {
   // dir: /absolute/path/to/20231230035547807/String#match/test/fixtures
   const { default: prod } = await import(pathToFileURL(`${dir}/prod.mjs`));
   
-  // Return a Promise-based async function
-  // This will be automatically wrapped to work with Benchmark.js
-  return async () => {
+  // Use asyncBench to register an async benchmark function
+  return asyncBench(async () => {
     // Simulate some async operation
     await delay(1);
     prod('Hello World with Promise!');
-  };
+  });
 }).then((suite) => {
   console.log('FINISHED');
 }).catch((err) => {

@@ -197,25 +197,23 @@ describe('Promise-based asynchronous benchmarks', () => {
       }
     });
 
-    it('should handle all three benchmark function types correctly', () => {
-      return setup.run(specs, ({ suite: _suite, spec, dir }) => {
+    it('should handle both benchmark function types correctly', () => {
+      return setup.run(specs, ({ suite: _suite, spec, dir, syncBench, asyncBench }) => {
         if (spec.git === 'bench-test-1') {
           // Synchronous function
-          return () => {
+          return syncBench(() => {
             // Sync operation
-          };
+          });
         } else if (spec.git === 'bench-test-2') {
-          // Traditional Deferred pattern
-          return (deferred) => {
-            setTimeout(() => {
-              deferred.resolve();
-            }, 10);
-          };
+          // Async function using Promise
+          return asyncBench(async () => {
+            await new Promise(resolve => setTimeout(resolve, 10));
+          });
         } else {
-          // Promise-returning async function
-          return async () => {
+          // Another Promise-returning async function
+          return asyncBench(async () => {
             await delay(10, null);
-          };
+          });
         }
       }).then((_suite) => {
         assert.strictEqual(addCalls.length, 3);
@@ -224,9 +222,9 @@ describe('Promise-based asynchronous benchmarks', () => {
         const syncCall = addCalls.find(call => call.name === 'Sync(bench-test-1)');
         assert.strictEqual(syncCall?.options?.defer, false);
 
-        // Deferred benchmark should be deferred
-        const deferredCall = addCalls.find(call => call.name === 'Deferred(bench-test-2)');
-        assert.strictEqual(deferredCall?.options?.defer, true);
+        // Async benchmarks should be deferred
+        const asyncCall = addCalls.find(call => call.name === 'Deferred(bench-test-2)');
+        assert.strictEqual(asyncCall?.options?.defer, true);
 
         // Promise benchmark should be deferred (wrapped)
         const promiseCall = addCalls.find(call => call.name === 'Promise(bench-test-3)');

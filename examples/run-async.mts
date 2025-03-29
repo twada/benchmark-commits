@@ -1,7 +1,7 @@
 // node --experimental-strip-types run-async.mts
 import { pathToFileURL } from 'url';
 import { runBenchmark } from '../dist/index.mjs';
-import type { BenchmarkArguments, BenchmarkTarget } from '../dist/index.mjs';
+import type { BenchmarkArguments, BenchmarkTarget, SyncBenchmarkFunction } from '../dist/index.mjs';
 const specs: BenchmarkTarget[] = [
   {
     name: 'Regex#test',
@@ -25,12 +25,12 @@ const specs: BenchmarkTarget[] = [
     ]
   }
 ];
-runBenchmark(specs, async ({ suite, spec, dir }: BenchmarkArguments) => {
+runBenchmark(specs, async ({ suite, spec, dir, syncBench }: BenchmarkArguments) => {
   // dir => /absolute/path/to/timestamp-dir/String#match/
   const {default: prod} = await import(pathToFileURL(`${dir}/test/fixtures/prod.mjs`).toString());
-  return () => {
+  return syncBench(() => {
     prod('Hello World!');
-  };
+  });
 }).then((suite) => {
   const expectedFastest = 'String#indexOf';
   const fastestNames = suite.filter('fastest').map('name');
