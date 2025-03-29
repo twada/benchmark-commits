@@ -205,6 +205,7 @@ function setupSuite (suite: BenchmarkSuite, workDir: string): SuiteSetup {
 }
 
 export type {
+  BenchmarkSpec,
   NormalizedBenchmarkSpec,
   BenchmarkRegisterFunction,
   BenchmarkArguments,
