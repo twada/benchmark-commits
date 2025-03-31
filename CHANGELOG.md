@@ -1,3 +1,95 @@
+## [0.4.0](http://github.com/twada/benchmark-commits/releases/tag/v0.4.0) (2025-03-29)
+
+
+### Features
+
+* Implement explicit benchmark registration interface ([ADR-002](./docs/adr-002-explicit-benchmark-registration.en.md))
+  * Added explicit `syncBench` and `asyncBench` functions to register benchmark functions
+  * Updated all examples and documentation
+  * Added migration guide
+
+### BREAKING CHANGES
+
+* Removed support for direct function returns
+* Removed support for Deferred pattern
+
+
+### Migration Guide From v0.3.x to v0.4.x
+
+Version 0.4.0 introduces a breaking change in the API for registering benchmark functions. 
+The main changes are:
+
+1. Explicit registration functions `syncBench` and `asyncBench` are now required
+2. Traditional Deferred pattern is no longer supported
+3. Direct function returns are no longer supported
+
+#### Migrating Synchronous Benchmarks
+
+Before:
+```javascript
+runBenchmark(specs, ({ suite, spec, dir }) => {
+  return () => {
+    // Synchronous operation
+  };
+});
+```
+
+After:
+```javascript
+runBenchmark(specs, ({ suite, spec, dir, syncBench }) => {
+  return syncBench(() => {
+    // Synchronous operation
+  });
+});
+```
+
+#### Migrating Deferred Pattern Async Benchmarks
+
+Before:
+```javascript
+runBenchmark(specs, ({ suite, spec, dir }) => {
+  return (deferred) => {
+    setTimeout(() => {
+      // Async operation
+      deferred.resolve();
+    }, 100);
+  };
+});
+```
+
+After:
+```javascript
+runBenchmark(specs, ({ suite, spec, dir, asyncBench }) => {
+  return asyncBench(async () => {
+    await new Promise(resolve => setTimeout(resolve, 100));
+    // Async operation
+  });
+});
+```
+
+#### Migrating Promise-based Async Benchmarks
+
+Before:
+```javascript
+runBenchmark(specs, ({ suite, spec, dir }) => {
+  return async () => {
+    // Async operation
+    await someAsyncOperation();
+  };
+});
+```
+
+After:
+```javascript
+runBenchmark(specs, ({ suite, spec, dir, asyncBench }) => {
+  return asyncBench(async () => {
+    // Async operation
+    await someAsyncOperation();
+  });
+});
+```
+
+
 ### [0.3.1](http://github.com/twada/benchmark-commits/releases/tag/v0.3.1) (2023-12-30)
 
 

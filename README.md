@@ -25,50 +25,28 @@ USAGE
 ```javascript
 import { runBenchmark } from '@twada/benchmark-commits';
 
-runBenchmark(specs, ({ suite, spec, dir }) => {
-  return () => {
+runBenchmark(specs, ({ suite, spec, dir, syncBench }) => {
+  return syncBench(() => {
     // Synchronous operation
     someOperation();
-  };
+  });
 });
 ```
 
-### Asynchronous Benchmark (Promise-based pattern)
+### Asynchronous Benchmark
 
 ```javascript
 import { runBenchmark } from '@twada/benchmark-commits';
 
-runBenchmark(specs, ({ suite, spec, dir }) => {
-  // Return a function that returns a Promise
-  return async () => {
+runBenchmark(specs, ({ suite, spec, dir, asyncBench }) => {
+  return asyncBench(async () => {
     // Using modern async/await syntax
     const result = await asyncOperation();
     // Process result...
     // Errors are automatically handled
-  };
+  });
 });
 ```
-
-### Asynchronous Benchmark (Traditional Deferred pattern)
-
-```javascript
-import { runBenchmark } from '@twada/benchmark-commits';
-
-runBenchmark(specs, ({ suite, spec, dir }) => {
-  // Return a function that accepts a deferred object
-  return (deferred) => {
-    asyncOperation().then(() => {
-      // Processing...
-      deferred.resolve();
-    }).catch(err => {
-      console.error(err);
-      // Abort the benchmark on error
-      deferred.benchmark.abort();
-    });
-  };
-});
-```
-
 
 SPEC
 ---------------------------------------
@@ -85,19 +63,18 @@ SPEC
       - if `commitsOrSpecs` is already an array of `spec` object having {name, git} form
         - use them as `spec` object with default prepare
         - generated benchmark name is `name(git)`
-  - `register` is a benchmark registration function that returns benchmark function. benchmark registration function takes { suite, spec, dir} as arguments.
+  - `register` is a benchmark registration function that returns a benchmark registration object. benchmark registration function takes { suite, spec, dir, syncBench, asyncBench} as arguments.
+    - `syncBench` and `asyncBench` are functions provided to explicitly register synchronous or asynchronous benchmarks
     - if `register` function runs synchronously, register benchmark function immediately
     - if `register` function is an async function or returns Promise, register benchmark function asynchronously
-    - benchmark function can be one of three types:
-      - **Synchronous function** `() => void`: A function with no parameters that runs synchronously
-      - **Deferred pattern function** `(deferred) => void`: A function with one parameter that resolves the deferred when the async operation completes
-      - **Promise-returning function** `() => Promise<void>`: A function that returns a Promise which resolves when the async operation completes
-    - For Promise-returning functions, errors are properly handled and will abort the benchmark
-    - if benchmark function takes more than one parameter, skip benchmark registration for that `spec` since benchmark function is invalid
+    - benchmark function must be registered using one of two methods:
+      - **syncBench** `syncBench(() => void)`: For registering synchronous benchmark functions
+      - **asyncBench** `asyncBench(async () => Promise<void>)`: For registering asynchronous benchmark functions that return Promises
+    - Errors in asynchronous benchmarks are properly handled and will abort the benchmark
     - if git commit object in `commitsOrSpecs` does not exist in underlying git repository, skip benchmark registration for that `spec`
     - if error occurred while executing registration function, skip benchmark registration for that `spec`
     - if async registration function rejects, skip benchmark registration for that `spec`
-    - if benchmark registration function does not return function, skip benchmark registration for that `spec`
+    - if benchmark registration function does not return a valid registration object, skip benchmark registration for that `spec`
     - if all benchmark registrations have skipped, rejects with Error
 
 

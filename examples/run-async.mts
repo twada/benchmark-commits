@@ -25,12 +25,12 @@ const specs: BenchmarkTarget[] = [
     ]
   }
 ];
-runBenchmark(specs, async ({ suite, spec, dir }: BenchmarkArguments) => {
+runBenchmark(specs, async ({ suite, spec, dir, syncBench }: BenchmarkArguments) => {
   // dir => /absolute/path/to/timestamp-dir/String#match/
   const {default: prod} = await import(pathToFileURL(`${dir}/test/fixtures/prod.mjs`).toString());
-  return () => {
+  return syncBench(() => {
     prod('Hello World!');
-  };
+  });
 }).then((suite) => {
   const expectedFastest = 'String#indexOf';
   const fastestNames = suite.filter('fastest').map('name');

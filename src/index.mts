@@ -2,7 +2,18 @@ import { join } from 'node:path';
 import { rmSync } from 'node:fs';
 import Benchmark from 'benchmark';
 import { setupSuite, normalizeSpecs, benchmarkName } from './suite-setup.mjs';
-import type { NormalizedBenchmarkSpec, BenchmarkRegisterFunction, BenchmarkArguments, BenchmarkTarget } from './suite-setup.mjs';
+import type {
+  BenchmarkSpec,
+  NormalizedBenchmarkSpec,
+  BenchmarkRegisterFunction,
+  BenchmarkArguments,
+  BenchmarkTarget,
+  SyncBenchmarkFunction,
+  AsyncBenchmarkFunction,
+  SyncBenchmarkRegistration,
+  AsyncBenchmarkRegistration,
+  BenchmarkRegistration
+} from './suite-setup.mjs';
 
 type BenchmarkLogger = {
   log (message?: any, ...optionalParams: any[]): void;
@@ -110,11 +121,18 @@ function runBenchmark (commitsOrSpecs: BenchmarkTarget[], register: BenchmarkReg
 }
 
 export type {
+  BenchmarkSpec,
   BenchmarkTarget,
   BenchmarkRegisterFunction,
+  NormalizedBenchmarkSpec,
   BenchmarkArguments,
   BenchmarkOptions,
   BenchmarkLogger,
+  SyncBenchmarkFunction,
+  AsyncBenchmarkFunction,
+  SyncBenchmarkRegistration,
+  AsyncBenchmarkRegistration,
+  BenchmarkRegistration
 };
 
 export {
