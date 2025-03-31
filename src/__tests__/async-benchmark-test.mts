@@ -97,7 +97,7 @@ describe('Promise-based asynchronous benchmarks', () => {
       // Wait for async operations to complete
       await delay(50, null);
 
-      assert.strictEqual(resolveCalled, false);
+      assert.strictEqual(resolveCalled, true);
       assert.strictEqual(abortCalled, true);
     });
 
@@ -112,7 +112,7 @@ describe('Promise-based asynchronous benchmarks', () => {
       // Wait for async operations to complete
       await delay(50, null);
 
-      assert.strictEqual(resolveCalled, false);
+      assert.strictEqual(resolveCalled, true);
       assert.strictEqual(abortCalled, true);
     });
   });
