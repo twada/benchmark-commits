@@ -220,17 +220,6 @@ Key components:
 
 - Node.js >= 22.12.0
 - Git (accessible from the command line)
-- NPM (for default preparation steps)
-
-## Best Practices
-
-- Use consistent hardware for comparisons
-- Run multiple times for statistical significance
-- Ensure system load is similar between runs
-- Prepare proper warm-up cycles
-- Consider benchmark error margins
-- Use meaningful benchmark names
-- Handle benchmark skipping gracefully
 
 ## License
 
