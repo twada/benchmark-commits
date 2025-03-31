@@ -1,4 +1,4 @@
-## [0.4.0](http://github.com/twada/benchmark-commits/releases/tag/v0.4.0) (2025-03-29)
+## Unreleased
 
 
 ### Features
