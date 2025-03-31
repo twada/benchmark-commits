@@ -99,7 +99,7 @@ function runSetup (setup: SuiteSetup, specs: NormalizedBenchmarkSpec[], register
       assert(result !== undefined, 'result should not be undefined');
       if (result.status === 'fulfilled') {
         const registration = result.value;
-        if (registration && typeof registration === 'object' && 'async' in registration && 'fn' in registration) {
+        if (typeof registration === 'object' && registration !== null && Object.hasOwn(registration, 'async') && Object.hasOwn(registration, 'fn') && typeof registration.fn === 'function') {
           if (registration.async) {
             // Async benchmark
             const wrappedFn = wrapPromiseBenchmark(registration.fn as AsyncBenchmarkFunction);
