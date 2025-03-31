@@ -102,7 +102,7 @@ function runSetup (setup: SuiteSetup, specs: NormalizedBenchmarkSpec[], register
         if (typeof registration === 'object' && registration !== null && Object.hasOwn(registration, 'async') && Object.hasOwn(registration, 'fn') && typeof registration.fn === 'function') {
           if (registration.async) {
             // Async benchmark
-            const wrappedFn = wrapPromiseBenchmark(registration.fn as AsyncBenchmarkFunction);
+            const wrappedFn = wrapPromiseBenchmark(registration.fn);
             suite.add(benchmarkName(spec), wrappedFn, { defer: true });
           } else {
             // Sync benchmark
