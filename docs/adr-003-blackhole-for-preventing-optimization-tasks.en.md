@@ -6,39 +6,39 @@ This document tracks the implementation tasks for the blackhole feature describe
 
 ### Core Implementation
 
-- [ ] Add `blackhole` function implementation to `suite-setup.mts`
-- [ ] Update `BenchmarkArguments` interface to include `blackhole` function
-- [ ] Add `blackhole` to the return value in the benchmark registration function
+- [x] Add `blackhole` function implementation to `suite-setup.mts`
+- [x] Update `BenchmarkArguments` interface to include `blackhole` function
+- [x] Add `blackhole` to the return value in the benchmark registration function
 
 ### Documentation Updates
 
-- [ ] Update README.md with blackhole feature explanation and usage examples
-- [ ] Add blackhole feature to the API reference documentation
-- [ ] Add a section about preventing optimization to the "Key Features" section
+- [x] Update README.md with blackhole feature explanation and usage examples
+- [x] Add blackhole feature to the API reference documentation
+- [x] Add a section about preventing optimization to the "Key Features" section
 
 ### Testing
 
-- [ ] Create unit tests for the blackhole function
+- [x] Create unit tests for the blackhole function
 - [ ] Add integration tests to verify that blackhole prevents optimization
 - [ ] Create a benchmark comparison with and without blackhole to demonstrate its effectiveness
 
 ### Examples
 
-- [ ] Update existing examples to use the blackhole feature
-- [ ] Create a new example file specifically demonstrating optimization prevention
-- [ ] Add comments explaining the importance of the blackhole feature
+- [x] Update existing examples to use the blackhole feature
+- [x] Create a new example file specifically demonstrating optimization prevention
+- [x] Add comments explaining the importance of the blackhole feature
 
 ### TypeScript Types
 
 - [ ] Update type exports in index.mts
-- [ ] Ensure proper TypeScript typing throughout the codebase
-- [ ] Verify that IDE autocompletion works correctly with the new parameter
+- [x] Ensure proper TypeScript typing throughout the codebase
+- [x] Verify that IDE autocompletion works correctly with the new parameter
 
 ### Release Preparation
 
-- [ ] Update CHANGELOG.md with the new feature
-- [ ] Determine if this is a minor or patch version update
-- [ ] Create migration notes if needed
+- [x] Update CHANGELOG.md with the new feature
+- [x] Determine if this is a minor or patch version update
+- [x] Create migration notes if needed
 
 ## Completion Criteria
 
