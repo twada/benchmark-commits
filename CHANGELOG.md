@@ -3,6 +3,10 @@
 
 ### Features
 
+* Support Promise-based asynchronous benchmarks ([ADR-001](./docs/adr-001-promise-based-async-benchmarks.en.md))
+  * Added support for async/await pattern in benchmark functions
+  * Improved error handling for asynchronous benchmarks
+  * Modern syntax with cleaner Promise-based approach
 * Implement explicit benchmark registration interface ([ADR-002](./docs/adr-002-explicit-benchmark-registration.en.md))
   * Added explicit `syncBench` and `asyncBench` functions to register benchmark functions
   * Updated all examples and documentation
