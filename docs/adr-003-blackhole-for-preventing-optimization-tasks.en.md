@@ -19,8 +19,8 @@ This document tracks the implementation tasks for the blackhole feature describe
 ### Testing
 
 - [x] Create unit tests for the blackhole function
-- [ ] Add integration tests to verify that blackhole prevents optimization
-- [ ] Create a benchmark comparison with and without blackhole to demonstrate its effectiveness
+- [x] Add integration tests to verify that blackhole prevents optimization
+- [x] Create a benchmark comparison with and without blackhole to demonstrate its effectiveness
 
 ### Examples
 
