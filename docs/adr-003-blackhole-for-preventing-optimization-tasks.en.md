@@ -30,7 +30,6 @@ This document tracks the implementation tasks for the blackhole feature describe
 
 ### TypeScript Types
 
-- [ ] Update type exports in index.mts
 - [x] Ensure proper TypeScript typing throughout the codebase
 - [x] Verify that IDE autocompletion works correctly with the new parameter
 
