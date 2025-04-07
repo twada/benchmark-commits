@@ -38,6 +38,7 @@ npm install @twada/benchmark-commits
 - **Flexible Configuration**: Customize preparation steps for each commit/version
 - **Monorepo Support**: Specify workdir to benchmark subprojects in monorepos
 - **Error Handling**: Robust error handling for both sync and async benchmarks
+- **Optimization Prevention**: Blackhole feature to prevent JIT compiler optimizations from affecting benchmark results
 
 ## Usage Examples
 
@@ -49,12 +50,13 @@ import { runBenchmark } from '@twada/benchmark-commits';
 // Array of git commits/tags to benchmark
 const specs = ['v1.0.0', 'v1.1.0', 'main'];
 
-runBenchmark(specs, ({ suite, spec, dir, syncBench }) => {
+runBenchmark(specs, ({ suite, spec, dir, syncBench, blackhole }) => {
   return syncBench(() => {
     // Synchronous operation to benchmark
     // e.g., string manipulation, calculations, etc.
     const result = someOperation();
-    // Use result to avoid dead code elimination
+    // Use blackhole to prevent dead code elimination
+    blackhole(result);
   });
 });
 ```
@@ -70,11 +72,12 @@ const specs = [
   { name: 'Optimized', git: 'feature/optimization' }
 ];
 
-runBenchmark(specs, ({ suite, spec, dir, asyncBench }) => {
+runBenchmark(specs, ({ suite, spec, dir, asyncBench, blackhole }) => {
   return asyncBench(async () => {
     // Using modern async/await syntax
     const result = await asyncOperation();
-    // Process result
+    // Prevent JIT optimization of the result
+    blackhole(result);
     // Errors are automatically handled
   });
 });
@@ -98,12 +101,13 @@ const specs = [
   }
 ];
 
-runBenchmark(specs, ({ suite, spec, dir, syncBench }) => {
+runBenchmark(specs, ({ suite, spec, dir, syncBench, blackhole }) => {
   // Import the built module from the prepared directory
   const module = require(`${dir}/dist/index.js`);
 
   return syncBench(() => {
-    module.runOperation();
+    const result = module.runOperation();
+    blackhole(result);
   });
 });
 ```
@@ -126,12 +130,13 @@ const specs = [
   }
 ];
 
-runBenchmark(specs, ({ suite, spec, dir, asyncBench }) => {
+runBenchmark(specs, ({ suite, spec, dir, asyncBench, blackhole }) => {
   // `dir` points to the workdir (packages/core)
   const module = await import(`${dir}/dist/index.js`);
 
   return asyncBench(async () => {
-    await module.performTask();
+    const result = await module.performTask();
+    blackhole(result);
   });
 });
 ```
@@ -196,8 +201,33 @@ type BenchmarkArguments = {
   dir: string;
   syncBench: (fn: SyncBenchmarkFunction) => SyncBenchmarkRegistration;
   asyncBench: (fn: AsyncBenchmarkFunction) => AsyncBenchmarkRegistration;
+  blackhole: (value: any) => void; // Function to prevent JIT optimization
 };
 ```
+
+### Preventing JIT Optimization with the Blackhole Function
+
+When benchmarking code, JavaScript's JIT compiler may optimize away calculations whose results are not used, leading to artificially fast benchmarks that don't reflect real-world performance. The `blackhole` function prevents this by consuming the result values in a way that the JIT compiler can't predict, ensuring that:
+
+1. All calculations are actually performed during benchmarking
+2. Results are accurately measured without being affected by dead code elimination
+3. Benchmark code remains clean and readable
+
+Example usage:
+
+```javascript
+runBenchmark(specs, ({ syncBench, blackhole }) => {
+  return syncBench(() => {
+    // Without blackhole, this calculation might be optimized away
+    const result = expensiveCalculation();
+    
+    // Use blackhole to ensure the calculation is performed
+    blackhole(result);
+  });
+});
+```
+
+The `blackhole` function is implemented to have minimal overhead while reliably preventing optimization.
 
 ## Internal Architecture
 

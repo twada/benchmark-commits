@@ -21,7 +21,8 @@ type BenchmarkArguments = {
   spec: NormalizedBenchmarkSpec,
   dir: string,
   syncBench: (fn: SyncBenchmarkFunction) => SyncBenchmarkRegistration,
-  asyncBench: (fn: AsyncBenchmarkFunction) => AsyncBenchmarkRegistration
+  asyncBench: (fn: AsyncBenchmarkFunction) => AsyncBenchmarkRegistration,
+  blackhole: (value: any) => void
 };
 type BenchmarkRegisterFunction = (benchmarkArguments: BenchmarkArguments) => BenchmarkRegistration | Promise<BenchmarkRegistration>;
 
@@ -89,7 +90,7 @@ function runSetup (setup: SuiteSetup, specs: NormalizedBenchmarkSpec[], register
       const asyncBench = (fn: AsyncBenchmarkFunction): AsyncBenchmarkRegistration => {
         return { async: true, fn };
       };
-      return register({ suite, spec, dir, syncBench, asyncBench });
+      return register({ suite, spec, dir, syncBench, asyncBench, blackhole });
     });
   });
 
@@ -160,6 +161,23 @@ function wrapPromiseBenchmark (fn: AsyncBenchmarkFunction): AsyncDeferredFunctio
   };
 }
 
+const blackhole = (() => {
+  // Use a structure that is difficult to statically analyze
+  const sink = new WeakMap<object, any>();
+  // Create an array of 32 objects upfront
+  const keys = Array.from({ length: 32 }, () => ({}));
+  let keyIndex = 0;
+
+  return (value: any) => {
+    // Use cycling keys (memory efficient)
+    const key = keys[keyIndex]!; // Using non-null assertion since we know the array has 32 items
+    keyIndex = (keyIndex + 1) & 31; // Cycle in the range 0-31
+
+    // Store in WeakMap (shows the JIT that the value is being used)
+    sink.set(key, value);
+  };
+})();
+
 function setupSuite (suite: BenchmarkSuite, workDir: string): SuiteSetup {
   return new SuiteSetup(suite, workDir);
 }
@@ -183,5 +201,6 @@ export {
   parseCommandLine,
   normalizeSpecs,
   benchmarkName,
-  wrapPromiseBenchmark
+  wrapPromiseBenchmark,
+  blackhole
 };

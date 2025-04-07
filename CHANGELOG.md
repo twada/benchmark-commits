@@ -7,6 +7,10 @@
   * Added explicit `syncBench` and `asyncBench` functions to register benchmark functions
   * Updated all examples and documentation
   * Added migration guide
+* Add blackhole feature to prevent JIT optimization ([ADR-003](./docs/adr-003-blackhole-for-preventing-optimization.en.md))
+  * Added `blackhole` function to prevent dead code elimination
+  * Updated all examples to use the blackhole function
+  * Added dedicated example file demonstrating optimization prevention
 
 ### BREAKING CHANGES
 
@@ -36,9 +40,11 @@ runBenchmark(specs, ({ suite, spec, dir }) => {
 
 After:
 ```javascript
-runBenchmark(specs, ({ suite, spec, dir, syncBench }) => {
+runBenchmark(specs, ({ suite, spec, dir, syncBench, blackhole }) => {
   return syncBench(() => {
     // Synchronous operation
+    const result = someOperation();
+    blackhole(result); // Prevent JIT optimization
   });
 });
 ```
@@ -59,10 +65,12 @@ runBenchmark(specs, ({ suite, spec, dir }) => {
 
 After:
 ```javascript
-runBenchmark(specs, ({ suite, spec, dir, asyncBench }) => {
+runBenchmark(specs, ({ suite, spec, dir, asyncBench, blackhole }) => {
   return asyncBench(async () => {
     await new Promise(resolve => setTimeout(resolve, 100));
     // Async operation
+    const result = await someAsyncOperation();
+    blackhole(result); // Prevent JIT optimization
   });
 });
 ```
@@ -81,10 +89,11 @@ runBenchmark(specs, ({ suite, spec, dir }) => {
 
 After:
 ```javascript
-runBenchmark(specs, ({ suite, spec, dir, asyncBench }) => {
+runBenchmark(specs, ({ suite, spec, dir, asyncBench, blackhole }) => {
   return asyncBench(async () => {
     // Async operation
-    await someAsyncOperation();
+    const result = await someAsyncOperation();
+    blackhole(result); // Prevent JIT optimization
   });
 });
 ```
