@@ -1,20 +1,20 @@
-# Implementation Tasks for ADR-004: CI Integration
+# Implementation Tasks for ADR-004: Performance Comparison Against Baseline
 
-This document outlines the implementation tasks for adding CI integration for performance testing as described in [ADR-004](./adr-004-ci-integration.en.md).
+This document outlines the implementation tasks for adding performance comparison against baseline functionality as described in [ADR-004](./adr-004-ci-integration.en.md).
 
 
 ## TypeScript Tasks
 
-- [ ] Create new TypeScript types for CI integration
-  - [ ] Define `CIBaseline` type
-  - [ ] Define `CIOptions` type
+- [ ] Create new TypeScript types for baseline comparison
+  - [ ] Define `BaselineSpec` type
+  - [ ] Define `ComparisonOptions` type
   - [ ] Define `AnalysisResult` type
 
 ## Core Implementation Tasks
 
 - [ ] Implement core analysis function
-  - [ ] Create `analyzeCIBenchmarkResults` function
-  - [ ] Add logic to compare baseline vs PR branch
+  - [ ] Create `analyzePerformanceResults` function
+  - [ ] Add logic to compare baseline vs target branch
   - [ ] Implement degradation calculation
   - [ ] Add pass/fail determination based on thresholds
 
@@ -33,38 +33,41 @@ This document outlines the implementation tasks for adding CI integration for pe
 ## More Implementation Tasks
 
 - [ ] Implement result reporting
-  - [ ] Create `logCIResult` function
+  - [ ] Create `logComparisonResult` function
   - [ ] Design clear, formatted logger output
   - [ ] Include performance metrics and comparison
   - [ ] Use BenchmarkLogger instead of direct console.log
 
-- [ ] Implement main CI benchmark function
-  - [ ] Create `runCIBenchmark` function
-  - [ ] Add PR branch auto-detection from environment variables
+- [ ] Implement main benchmark comparison function
+  - [ ] Create `benchmarkAgainstBaseline` function
+  - [ ] Add target branch auto-detection from git and environment variables
   - [ ] Handle specs creation based on baseline information
   - [ ] Integrate with existing `runBenchmark` function
-  - [ ] Add exit code handling for CI integration
+  - [ ] Add exit code handling for automated environments
   - [ ] Configure logger from options
 
 ## Documentation Tasks
 
-- [ ] Update README.md with CI integration information
-  - [ ] Add explanation of `runCIBenchmark` function
+- [ ] Update README.md with performance comparison information
+  - [ ] Add explanation of `benchmarkAgainstBaseline` function
   - [ ] Include usage examples
 
-- [ ] Create CI integration guide
-  - [ ] GitHub Actions examples
+- [ ] Create usage guide
+  - [ ] Local development usage examples
+  - [ ] CI integration examples (GitHub Actions, etc.)
 
 - [ ] Add JSDoc comments to all new functions and types
 
 ## Example Implementation Tasks
 
-- [ ] Create example CI configuration files
+- [ ] Create example configuration files
   - [ ] GitHub Actions workflow example
+  - [ ] Local development example
 
 - [ ] Create example usage scripts
-  - [ ] Basic CI benchmark example
+  - [ ] Basic performance comparison example
   - [ ] Advanced configuration example
+  - [ ] CI integration example
 
 ## Release Tasks
 
