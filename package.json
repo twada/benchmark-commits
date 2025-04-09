@@ -44,6 +44,7 @@
   ],
   "scripts": {
     "example": "node --experimental-strip-types examples/run-async.mts",
+    "typecheck": "tsc --noEmit",
     "build": "rimraf dist && tsc",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
