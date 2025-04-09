@@ -6,7 +6,7 @@ Proposed
 
 ## Date
 
-2025-04-08
+2025-04-09
 
 ## Context
 
@@ -20,7 +20,7 @@ Currently, users need to manually configure benchmark specs and interpret result
 
 ## Decision
 
-We will add a new specialized API called `benchmarkAgainstBaseline` with the following features:
+We will add a new specialized API called `benchmarkDiffWithBaseline` with the following features:
 
 1. Simplified API that only requires baseline branch information
 2. Automatic detection of the current branch (from git or CI environment variables)
@@ -30,10 +30,10 @@ We will add a new specialized API called `benchmarkAgainstBaseline` with the fol
 
 ### API Design
 
-The `benchmarkAgainstBaseline` function will have the following signature:
+The `benchmarkDiffWithBaseline` function will have the following signature:
 
 ```typescript
-function benchmarkAgainstBaseline(
+function benchmarkDiffWithBaseline(
   baseline: BaselineSpec,
   register: BenchmarkRegisterFunction,
   options?: ComparisonOptions
@@ -62,7 +62,7 @@ type ComparisonOptions = {
 
 To ensure testability, the implementation will be split into three main components:
 
-1. **benchmarkAgainstBaseline**: Main function that coordinates benchmark execution, analysis, and reporting
+1. **benchmarkDiffWithBaseline**: Main function that coordinates benchmark execution, analysis, and reporting
 2. **analyzePerformanceResults**: Pure function that analyzes benchmark results and determines pass/fail
 3. **logComparisonResult**: Function for formatted result output
 
@@ -71,7 +71,7 @@ This separation allows the core analysis logic to be unit tested independently w
 ### Usage Example
 
 ```typescript
-import { benchmarkAgainstBaseline } from '@twada/benchmark-commits';
+import { benchmarkDiffWithBaseline } from '@twada/benchmark-commits';
 
 // Minimal configuration
 const baseline = {
@@ -81,7 +81,7 @@ const baseline = {
 };
 
 // Current branch is automatically detected
-benchmarkAgainstBaseline(baseline, ({ suite, spec, dir, syncBench, blackhole }) => {
+benchmarkDiffWithBaseline(baseline, ({ suite, spec, dir, syncBench, blackhole }) => {
   return syncBench(() => {
     // Benchmark code
     const result = someOperation();
@@ -234,7 +234,7 @@ function logComparisonResult(result: {
 }
 
 // Main benchmark comparison function
-function benchmarkAgainstBaseline(
+function benchmarkDiffWithBaseline(
   baseline: BaselineSpec,
   register: BenchmarkRegisterFunction,
   options: ComparisonOptions = {}

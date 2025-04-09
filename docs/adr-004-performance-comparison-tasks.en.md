@@ -39,7 +39,7 @@ This document outlines the implementation tasks for adding performance compariso
   - [ ] Use BenchmarkLogger instead of direct console.log
 
 - [ ] Implement main benchmark comparison function
-  - [ ] Create `benchmarkAgainstBaseline` function
+  - [ ] Create `benchmarkDiffWithBaseline` function
   - [ ] Add target branch auto-detection from git and environment variables
   - [ ] Handle specs creation based on baseline information
   - [ ] Integrate with existing `runBenchmark` function
@@ -49,7 +49,7 @@ This document outlines the implementation tasks for adding performance compariso
 ## Documentation Tasks
 
 - [ ] Update README.md with performance comparison information
-  - [ ] Add explanation of `benchmarkAgainstBaseline` function
+  - [ ] Add explanation of `benchmarkDiffWithBaseline` function
   - [ ] Include usage examples
 
 - [ ] Create usage guide
