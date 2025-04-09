@@ -10,7 +10,7 @@ This document outlines the implementation tasks for adding benchmark diff with b
   - [ ] Define `ComparisonOptions` type
   - [ ] Define `AnalysisResult` type
 
-## Core Implementation Tasks
+## Implementation Tasks: core analysis function
 
 - [ ] Implement core analysis function
   - [ ] Create `analyzePerformanceResults` function
@@ -24,19 +24,21 @@ This document outlines the implementation tasks for adding benchmark diff with b
   - [ ] Test edge cases (missing benchmarks, etc.)
   - [ ] Test threshold handling
 
-- [ ] Unit tests for logging function
+## Implementation Tasks: result reporting function
+
+- [ ] Implement result reporting function
+  - [ ] Create `logComparisonResult` function
+  - [ ] Design clear, formatted logger output
+  - [ ] Include performance metrics and comparison
+  - [ ] Use BenchmarkLogger instead of direct console.log
+
+- [ ] Unit tests for result reporting function
   - [ ] Test performance degradation reporting
   - [ ] Test performance improvement reporting
   - [ ] Test failure reporting
   - [ ] Test formatting and symbols
 
-## More Implementation Tasks
-
-- [ ] Implement result reporting
-  - [ ] Create `logComparisonResult` function
-  - [ ] Design clear, formatted logger output
-  - [ ] Include performance metrics and comparison
-  - [ ] Use BenchmarkLogger instead of direct console.log
+## Implementation Tasks: main benchmark comparison function
 
 - [ ] Implement main benchmark comparison function
   - [ ] Create `benchmarkDiffWithBaseline` function
