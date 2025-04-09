@@ -5,10 +5,10 @@ This document outlines the implementation tasks for adding benchmark diff with b
 
 ## TypeScript Tasks
 
-- [ ] Create new TypeScript types for baseline comparison
-  - [ ] Define `BaselineSpec` type
-  - [ ] Define `ComparisonOptions` type
-  - [ ] Define `AnalysisResult` type
+- [x] Create new TypeScript types for baseline comparison
+  - [x] Define `BaselineSpec` type
+  - [x] Define `ComparisonOptions` type
+  - [x] Define `AnalysisResult` type
 
 ## Implementation Tasks: core analysis function
 
