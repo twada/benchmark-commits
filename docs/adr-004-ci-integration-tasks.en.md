@@ -24,12 +24,19 @@ This document outlines the implementation tasks for adding CI integration for pe
   - [ ] Test edge cases (missing benchmarks, etc.)
   - [ ] Test threshold handling
 
+- [ ] Unit tests for logging function
+  - [ ] Test performance degradation reporting
+  - [ ] Test performance improvement reporting
+  - [ ] Test failure reporting
+  - [ ] Test formatting and symbols
+
 ## More Implementation Tasks
 
 - [ ] Implement result reporting
   - [ ] Create `logCIResult` function
-  - [ ] Design clear, formatted console output
+  - [ ] Design clear, formatted logger output
   - [ ] Include performance metrics and comparison
+  - [ ] Use BenchmarkLogger instead of direct console.log
 
 - [ ] Implement main CI benchmark function
   - [ ] Create `runCIBenchmark` function
@@ -37,6 +44,7 @@ This document outlines the implementation tasks for adding CI integration for pe
   - [ ] Handle specs creation based on baseline information
   - [ ] Integrate with existing `runBenchmark` function
   - [ ] Add exit code handling for CI integration
+  - [ ] Configure logger from options
 
 ## Documentation Tasks
 

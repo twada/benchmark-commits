@@ -55,6 +55,7 @@ type CIOptions = {
   exitOnFail?: boolean;     // Exit process on failure
   exitCode?: number;        // Exit code to use on failure
   prBranch?: string;        // Optional manual PR branch (if auto-detection fails)
+  logger?: BenchmarkLogger; // Optional custom logger (defaults to ConsoleLogger)
 };
 ```
 
@@ -101,6 +102,7 @@ runCIBenchmark(baseline, ({ suite, spec, dir, syncBench, blackhole }) => {
 3. **Easier Local Testing**: Developers can easily check performance before creating a pull request
 4. **Testable Architecture**: Core logic can be unit tested independently
 5. **Consistent Reporting**: Standardized output format for clear result communication
+6. **Improved Testability**: Using BenchmarkLogger instead of direct console.log allows unit testing of output formatting
 
 ### Negative
 
@@ -117,9 +119,11 @@ runCIBenchmark(baseline, ({ suite, spec, dir, syncBench, blackhole }) => {
 ## Implementation Notes
 
 1. The `analyzeCIBenchmarkResults` function should be thoroughly unit tested
-2. The CI tool should provide clear error messages when configuration is incomplete or incorrect
-3. Documentation should include examples for popular CI systems (GitHub Actions, CircleCI, etc.)
-4. The API should remain stable, with any future enhancements being backward compatible
+2. The `logCIResult` function should be unit tested using a mock logger
+3. The CI tool should provide clear error messages when configuration is incomplete or incorrect
+4. Documentation should include examples for popular CI systems (GitHub Actions, CircleCI, etc.)
+5. The API should remain stable, with any future enhancements being backward compatible
+6. Use the existing `BenchmarkLogger` interface for logging to maintain consistency with the rest of the codebase
 
 ## Reference Implementation
 
@@ -207,26 +211,26 @@ function logCIResult(result: {
   message: string;
   baselineName?: string;
   prName?: string;
-}, baselineGit: string, prBranch: string): void {
-  console.log('\n============================================');
-  console.log('          PERFORMANCE CHECK RESULTS          ');
-  console.log('============================================');
+}, baselineGit: string, prBranch: string, logger: BenchmarkLogger): void {
+  logger.log('\n============================================');
+  logger.log('          PERFORMANCE CHECK RESULTS          ');
+  logger.log('============================================');
   
-  console.log(`Baseline: ${baselineGit} (${result.baselineName || 'N/A'})`);
-  console.log(`PR branch: ${prBranch} (${result.prName || 'N/A'})`);
+  logger.log(`Baseline: ${baselineGit} (${result.baselineName || 'N/A'})`);
+  logger.log(`PR branch: ${prBranch} (${result.prName || 'N/A'})`);
   
   if (result.degradation !== undefined) {
     const changeSymbol = result.degradation > 0 ? '▼' : '▲';
     const changeColor = result.degradation > 0 ? '❌' : '✅';
     
-    console.log(`\nPerformance change: ${changeColor} ${changeSymbol} ${Math.abs(result.degradation).toFixed(2)}%`);
-    console.log(`  - Baseline: ${result.baselineHz?.toFixed(2) || 'N/A'} ops/sec`);
-    console.log(`  - PR:       ${result.prHz?.toFixed(2) || 'N/A'} ops/sec`);
+    logger.log(`\nPerformance change: ${changeColor} ${changeSymbol} ${Math.abs(result.degradation).toFixed(2)}%`);
+    logger.log(`  - Baseline: ${result.baselineHz?.toFixed(2) || 'N/A'} ops/sec`);
+    logger.log(`  - PR:       ${result.prHz?.toFixed(2) || 'N/A'} ops/sec`);
   }
   
-  console.log(`\nResult: ${result.pass ? '✅ PASS' : '❌ FAIL'}`);
-  console.log(`Message: ${result.message}`);
-  console.log('============================================\n');
+  logger.log(`\nResult: ${result.pass ? '✅ PASS' : '❌ FAIL'}`);
+  logger.log(`Message: ${result.message}`);
+  logger.log('============================================\n');
 }
 
 // Main CI benchmark function
@@ -269,6 +273,9 @@ function runCIBenchmark(
   ];
   
   // Run benchmarks and analyze
+  // Get logger (default: ConsoleLogger)
+  const logger = options.logger || new ConsoleLogger();
+  
   return runBenchmark(specs, register).then(suite => {
     // Call analysis function
     const result = analyzeCIBenchmarkResults(suite, {
@@ -276,7 +283,7 @@ function runCIBenchmark(
     });
     
     // Output results
-    logCIResult(result, baseline.git, prBranch);
+    logCIResult(result, baseline.git, prBranch, logger);
     
     // Set exit code on failure
     if (!result.pass && ciOptions.exitOnFail) {
