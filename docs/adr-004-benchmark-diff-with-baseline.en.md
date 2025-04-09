@@ -1,4 +1,4 @@
-# ADR-004: Performance Comparison Against Baseline
+# ADR-004: Benchmark Diff With Baseline
 
 ## Status
 

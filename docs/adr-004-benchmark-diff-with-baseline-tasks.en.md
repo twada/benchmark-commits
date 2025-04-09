@@ -1,6 +1,6 @@
-# Implementation Tasks for ADR-004: Performance Comparison Against Baseline
+# Implementation Tasks for ADR-004: Benchmark Diff With Baseline
 
-This document outlines the implementation tasks for adding performance comparison against baseline functionality as described in [ADR-004](./adr-004-performance-comparison.en.md).
+This document outlines the implementation tasks for adding benchmark diff with baseline functionality as described in [ADR-004](./adr-004-benchmark-diff-with-baseline.en.md).
 
 
 ## TypeScript Tasks
