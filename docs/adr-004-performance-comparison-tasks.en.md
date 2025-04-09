@@ -1,6 +1,6 @@
 # Implementation Tasks for ADR-004: Performance Comparison Against Baseline
 
-This document outlines the implementation tasks for adding performance comparison against baseline functionality as described in [ADR-004](./adr-004-ci-integration.en.md).
+This document outlines the implementation tasks for adding performance comparison against baseline functionality as described in [ADR-004](./adr-004-performance-comparison.en.md).
 
 
 ## TypeScript Tasks
