@@ -18,11 +18,11 @@ This document outlines the implementation tasks for adding benchmark diff with b
   - [x] Implement degradation calculation
   - [x] Add pass/fail determination based on thresholds
 
-- [ ] Unit tests for analysis function
-  - [ ] Test performance degradation detection
-  - [ ] Test performance improvement detection
-  - [ ] Test edge cases (missing benchmarks, etc.)
-  - [ ] Test threshold handling
+- [x] Unit tests for analysis function
+  - [x] Test performance degradation detection
+  - [x] Test performance improvement detection
+  - [x] Test edge cases (missing benchmarks, etc.)
+  - [x] Test threshold handling
 
 ## Implementation Tasks: result reporting function
 
