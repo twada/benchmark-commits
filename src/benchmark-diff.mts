@@ -41,6 +41,48 @@ export type AnalysisFailure = {
 };
 
 /**
+ * Logs the comparison result in a formatted way
+ *
+ * @param result - The analysis result to log
+ * @param baselineGit - The git reference for the baseline
+ * @param targetBranch - The git reference for the target
+ * @param logger - The logger to use
+ */
+export function logComparisonResult (
+  result: AnalysisResult | AnalysisFailure,
+  baselineGit: string,
+  targetBranch: string,
+  logger: BenchmarkLogger
+): void {
+  logger.log('\n============================================');
+  logger.log('          PERFORMANCE CHECK RESULTS          ');
+  logger.log('============================================');
+
+  if (result.type === 'AnalysisFailure') {
+    logger.log(`Baseline: ${baselineGit}`);
+    logger.log(`Target: ${targetBranch}`);
+    logger.log('\nResult: ❌ FAIL');
+    logger.log(`Message: ${result.message}`);
+    logger.log('============================================\n');
+    return;
+  }
+
+  logger.log(`Baseline: ${baselineGit} (${result.baselineName})`);
+  logger.log(`Target: ${targetBranch} (${result.targetName})`);
+
+  const changeSymbol = result.degradation > 0 ? '▼' : '▲';
+  const changeColor = result.pass ? '✅' : '❌';
+
+  logger.log(`\nPerformance change: ${changeColor} ${changeSymbol} ${Math.abs(result.degradation).toFixed(2)}%`);
+  logger.log(`  - Baseline: ${result.baselineHz.toFixed(2)} ops/sec`);
+  logger.log(`  - Target:   ${result.targetHz.toFixed(2)} ops/sec`);
+
+  logger.log(`\nResult: ${result.pass ? '✅ PASS' : '❌ FAIL'}`);
+  logger.log(`Message: ${result.message}`);
+  logger.log('============================================\n');
+}
+
+/**
  * Analyzes performance results to determine if the target branch meets the performance criteria
  *
  * @param suite - The benchmark suite containing both baseline and target benchmarks

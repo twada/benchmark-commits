@@ -26,17 +26,17 @@ This document outlines the implementation tasks for adding benchmark diff with b
 
 ## Implementation Tasks: result reporting function
 
-- [ ] Implement result reporting function
-  - [ ] Create `logComparisonResult` function
-  - [ ] Design clear, formatted logger output
-  - [ ] Include performance metrics and comparison
-  - [ ] Use BenchmarkLogger instead of direct console.log
+- [x] Implement result reporting function
+  - [x] Create `logComparisonResult` function
+  - [x] Design clear, formatted logger output
+  - [x] Include performance metrics and comparison
+  - [x] Use BenchmarkLogger instead of direct console.log
 
-- [ ] Unit tests for result reporting function
-  - [ ] Test performance degradation reporting
-  - [ ] Test performance improvement reporting
-  - [ ] Test failure reporting
-  - [ ] Test formatting and symbols
+- [x] Unit tests for result reporting function
+  - [x] Test performance degradation reporting
+  - [x] Test performance improvement reporting
+  - [x] Test failure reporting
+  - [x] Test formatting and symbols
 
 ## Implementation Tasks: main benchmark comparison function
 
