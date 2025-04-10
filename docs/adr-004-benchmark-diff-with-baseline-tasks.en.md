@@ -12,11 +12,11 @@ This document outlines the implementation tasks for adding benchmark diff with b
 
 ## Implementation Tasks: core analysis function
 
-- [ ] Implement core analysis function
-  - [ ] Create `analyzePerformanceResults` function
-  - [ ] Add logic to compare baseline vs target branch
-  - [ ] Implement degradation calculation
-  - [ ] Add pass/fail determination based on thresholds
+- [x] Implement core analysis function
+  - [x] Create `analyzePerformanceResults` function
+  - [x] Add logic to compare baseline vs target branch
+  - [x] Implement degradation calculation
+  - [x] Add pass/fail determination based on thresholds
 
 - [ ] Unit tests for analysis function
   - [ ] Test performance degradation detection
