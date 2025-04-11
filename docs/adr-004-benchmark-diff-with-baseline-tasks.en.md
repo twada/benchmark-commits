@@ -50,27 +50,27 @@ This document outlines the implementation tasks for adding benchmark diff with b
 
 ## Documentation Tasks
 
-- [ ] Update README.md with performance comparison information
-  - [ ] Add explanation of `benchmarkDiffWithBaseline` function
-  - [ ] Include usage examples
+- [x] Update README.md with performance comparison information
+  - [x] Add explanation of `benchmarkDiffWithBaseline` function
+  - [x] Include usage examples
 
-- [ ] Create usage guide
-  - [ ] Local development usage examples
-  - [ ] CI integration examples (GitHub Actions, etc.)
+- [x] Create usage guide
+  - [x] Local development usage examples
+  - [x] CI integration examples (GitHub Actions, etc.)
 
-- [ ] Add JSDoc comments to all new functions and types
+- [x] Add JSDoc comments to all new functions and types
 
 ## Example Implementation Tasks
 
-- [ ] Create example configuration files
-  - [ ] GitHub Actions workflow example
-  - [ ] Local development example
+- [x] Create example configuration files
+  - [x] GitHub Actions workflow example
+  - [x] Local development example
 
-- [ ] Create example usage scripts
-  - [ ] Basic performance comparison example
-  - [ ] Advanced configuration example
-  - [ ] CI integration example
+- [x] Create example usage scripts
+  - [x] Basic performance comparison example
+  - [x] Advanced configuration example
+  - [x] CI integration example
 
 ## Release Tasks
 
-- [ ] Update CHANGELOG.md
+- [x] Update CHANGELOG.md
