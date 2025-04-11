@@ -39,8 +39,35 @@ npm install @twada/benchmark-commits
 - **Monorepo Support**: Specify workdir to benchmark subprojects in monorepos
 - **Error Handling**: Robust error handling for both sync and async benchmarks
 - **Optimization Prevention**: Blackhole feature to prevent JIT compiler optimizations from affecting benchmark results
+- **Performance Validation**: Compare current branch against a baseline with configurable thresholds for CI/CD
 
 ## Usage Examples
+
+### Performance Comparison with Baseline
+
+```javascript
+import { benchmarkDiffWithBaseline } from '@twada/benchmark-commits';
+
+// Minimal configuration for comparing current branch with main
+const baseline = {
+  git: 'main',                          // Baseline branch to compare against
+  prepare: ['npm install', 'npm run build'], // Optional preparation commands
+  workdir: 'packages/core'              // Optional working directory
+};
+
+// Auto-detects current branch and validates performance
+benchmarkDiffWithBaseline(baseline, ({ suite, spec, dir, syncBench, blackhole }) => {
+  return syncBench(() => {
+    // Your benchmark code here
+    const result = someOperation();
+    blackhole(result);
+  });
+}, {
+  maxDegradation: 5,  // Fail if current branch is more than 5% slower
+  exitOnFail: true,   // Exit process with error code on failure (good for CI)
+  exitCode: 1         // Optional custom exit code
+});
+```
 
 ### Synchronous Benchmark
 
@@ -174,6 +201,36 @@ Runs benchmarks for the given git commits or specs, using the provided register 
 - Promise that resolves with the benchmark suite after all benchmarks have completed
 - Rejects if all benchmarks fail
 
+### benchmarkDiffWithBaseline(baseline, register, options?): Promise<{suite, result}>
+
+Runs a performance comparison between the current branch (or specified target branch) and a baseline branch, with automatic performance threshold validation.
+
+#### Parameters:
+
+- **baseline**: `BaselineSpec`
+  - Configuration for the baseline branch to compare against
+  - Properties:
+    - `git`: Git reference for the baseline (commit, tag, or branch name)
+    - `prepare?`: Optional array of shell commands to run for preparation
+    - `workdir?`: Optional subdirectory to use as working directory
+
+- **register**: `(args: BenchmarkArguments) => BenchmarkRegistration | Promise<BenchmarkRegistration>`
+  - Function that configures and returns a benchmark
+  - Receives the same arguments as `runBenchmark`
+
+- **options**: `ComparisonOptions` (optional)
+  - `maxDegradation?`: Maximum allowed performance degradation in percent (default: 5%)
+  - `exitOnFail?`: Whether to exit the process on failure (default: true)
+  - `exitCode?`: Exit code to use on failure (default: 1)
+  - `targetBranch?`: Manual target branch if auto-detection fails
+  - `logger?`: Custom logger object (defaults to console)
+
+#### Returns:
+
+- Promise that resolves with an object containing:
+  - `suite`: The benchmark suite after completion
+  - `result`: Analysis result with performance metrics and pass/fail status
+
 ### Type Definitions
 
 ```typescript
@@ -183,6 +240,34 @@ type BenchmarkSpec = {
   git: string;
   prepare?: string[];
   workdir?: string;
+};
+
+// Baseline specification for performance comparison
+type BaselineSpec = {
+  git: string;          // Baseline git reference (commit, tag, branch)
+  prepare?: string[];   // Optional preparation commands
+  workdir?: string;     // Optional working directory
+};
+
+// Options for performance comparison
+type ComparisonOptions = {
+  maxDegradation?: number;  // Maximum allowed performance degradation (%)
+  exitOnFail?: boolean;     // Exit process on failure
+  exitCode?: number;        // Exit code to use on failure
+  targetBranch?: string;    // Optional manual target branch
+  logger?: BenchmarkLogger; // Optional custom logger
+};
+
+// Result of performance analysis
+type AnalysisResult = {
+  type: 'AnalysisResult';
+  pass: boolean;        // Whether the performance check passed
+  message: string;      // Human-readable result message
+  degradation: number;  // Performance degradation percentage
+  baselineHz: number;   // Operations per second for baseline
+  targetHz: number;     // Operations per second for target
+  baselineName: string; // Name of baseline benchmark
+  targetName: string;   // Name of target benchmark
 };
 
 // Benchmark registration functions
@@ -245,6 +330,8 @@ Key components:
 - **SuiteSetup**: Manages the setup and preparation of benchmarks
 - **BenchmarkRegistration**: Handles the registration of benchmark functions
 - **Event System**: Provides detailed progress and error reporting
+- **Performance Analysis**: Analyzes benchmark results and validates against thresholds
+- **Reporting**: Generates formatted performance comparison reports
 
 ## Requirements
 

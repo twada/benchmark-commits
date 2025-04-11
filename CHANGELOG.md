@@ -1,6 +1,15 @@
 ## Unreleased
 
 
+### Features
+
+* Add benchmarkDiffWithBaseline for performance validation ([ADR-004](./docs/adr-004-benchmark-diff-with-baseline.en.md))
+  * Add new specialized API for comparing current branch against a baseline
+  * Implement automatic performance threshold validation
+  * Add support for CI/CD integration with exit code control
+  * Add detailed performance reporting with pass/fail indicators
+  * Add comprehensive documentation and usage examples
+
 
 ## [0.4.0](http://github.com/twada/benchmark-commits/releases/tag/v0.4.0) (2025-04-07)
 

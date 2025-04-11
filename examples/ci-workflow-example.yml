@@ -1,0 +1,51 @@
+name: Performance Testing
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  performance-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch all history for all branches and tags
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run performance benchmark against main
+        run: node ./performance-test.mjs
+        # The script below uses benchmarkDiffWithBaseline to compare the current PR branch
+        # against main branch, automatically setting an exit code on performance regression
+
+# Example performance-test.mjs content:
+#
+# import { benchmarkDiffWithBaseline } from '@twada/benchmark-commits';
+# 
+# // Compare current PR branch against main
+# const baseline = {
+#   git: 'main',
+#   prepare: ['npm ci', 'npm run build'],
+# };
+# 
+# benchmarkDiffWithBaseline(baseline, ({ syncBench, blackhole }) => {
+#   return syncBench(() => {
+#     // Your benchmark code here
+#     const result = calculateSomething();
+#     blackhole(result);
+#   });
+# }, {
+#   maxDegradation: 5,  // Fail if more than 5% slower
+#   exitOnFail: true,   // Exit with error code on failure
+#   // GitHub Actions will automatically use GITHUB_HEAD_REF for PR branches
+# });
