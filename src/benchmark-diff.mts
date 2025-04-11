@@ -1,5 +1,6 @@
 import type Benchmark from 'benchmark';
-import type { BenchmarkLogger } from './index.mjs';
+import { runBenchmark } from './index.mjs';
+import type { BenchmarkLogger, BenchmarkRegisterFunction, BenchmarkTarget } from './index.mjs';
 
 /**
  * Specification for the baseline branch to compare against
@@ -39,6 +40,19 @@ export type AnalysisFailure = {
   type: 'AnalysisFailure';
   message: string;
 };
+
+/**
+ * Console-based implementation of BenchmarkLogger
+ */
+class ConsoleLogger implements BenchmarkLogger {
+  log (message?: any, ...optionalParams: any[]): void {
+    console.log(message, ...optionalParams);
+  }
+
+  error (message?: any, ...optionalParams: any[]): void {
+    console.error(message, ...optionalParams);
+  }
+}
 
 /**
  * Logs the comparison result in a formatted way
@@ -142,4 +156,78 @@ export function analyzePerformanceResults (suite: Benchmark.Suite, options: {
   }
 
   return analysisResult;
+}
+
+/**
+ * Compares performance between baseline and target branches
+ *
+ * @param baseline - Specification for the baseline branch to compare against
+ * @param register - Function to register benchmarks
+ * @param options - Configuration options for the comparison
+ * @returns Promise resolving to the benchmark suite and analysis result
+ */
+export function benchmarkDiffWithBaseline (
+  baseline: BaselineSpec,
+  register: BenchmarkRegisterFunction,
+  options: ComparisonOptions = {}
+): Promise<{
+  suite: Benchmark.Suite;
+  result: AnalysisResult | AnalysisFailure;
+}> {
+  // Auto-detect target branch if not specified
+  const targetBranch = options.targetBranch ||
+                  process.env.GITHUB_HEAD_REF ||
+                  process.env.CI_COMMIT_REF_NAME ||
+                  'HEAD';
+
+  // Default options
+  const comparisonOptions: Required<ComparisonOptions> = {
+    maxDegradation: 5,
+    exitOnFail: true,
+    exitCode: 1,
+    targetBranch,
+    logger: new ConsoleLogger(),
+    ...options
+  };
+
+  // Create benchmark specs
+  const baselineSpec: BenchmarkTarget = {
+    name: 'Baseline',
+    git: baseline.git,
+    prepare: baseline.prepare,
+    workdir: baseline.workdir
+  };
+
+  const targetSpec: BenchmarkTarget = {
+    name: 'Target',
+    git: targetBranch,
+    prepare: baseline.prepare,
+    workdir: baseline.workdir
+  };
+
+  const specs: BenchmarkTarget[] = [baselineSpec, targetSpec];
+
+  // Get logger
+  const logger = comparisonOptions.logger;
+
+  // Run benchmarks and analyze
+  return runBenchmark(specs, register, { logger }).then(suite => {
+    // Call analysis function
+    const result = analyzePerformanceResults(suite, {
+      maxDegradation: comparisonOptions.maxDegradation
+    });
+
+    // Output results
+    logComparisonResult(result, baseline.git, targetBranch, logger);
+
+    // Set exit code on failure
+    if ((result.type === 'AnalysisResult' && !result.pass) ||
+        (result.type === 'AnalysisFailure')) {
+      if (comparisonOptions.exitOnFail) {
+        process.exit(comparisonOptions.exitCode);
+      }
+    }
+
+    return { suite, result };
+  });
 }

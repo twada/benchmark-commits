@@ -40,13 +40,13 @@ This document outlines the implementation tasks for adding benchmark diff with b
 
 ## Implementation Tasks: main benchmark comparison function
 
-- [ ] Implement main benchmark comparison function
-  - [ ] Create `benchmarkDiffWithBaseline` function
-  - [ ] Add target branch auto-detection from git and environment variables
-  - [ ] Handle specs creation based on baseline information
-  - [ ] Integrate with existing `runBenchmark` function
-  - [ ] Add exit code handling for automated environments
-  - [ ] Configure logger from options
+- [x] Implement main benchmark comparison function
+  - [x] Create `benchmarkDiffWithBaseline` function
+  - [x] Add target branch auto-detection from git and environment variables
+  - [x] Handle specs creation based on baseline information
+  - [x] Integrate with existing `runBenchmark` function
+  - [x] Add exit code handling for automated environments
+  - [x] Configure logger from options
 
 ## Documentation Tasks
 

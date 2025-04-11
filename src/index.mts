@@ -2,6 +2,7 @@ import { join } from 'node:path';
 import { rmSync } from 'node:fs';
 import Benchmark from 'benchmark';
 import { setupSuite, normalizeSpecs, benchmarkName } from './suite-setup.mjs';
+import { benchmarkDiffWithBaseline } from './benchmark-diff.mjs';
 import type {
   BenchmarkSpec,
   NormalizedBenchmarkSpec,
@@ -14,6 +15,12 @@ import type {
   AsyncBenchmarkRegistration,
   BenchmarkRegistration
 } from './suite-setup.mjs';
+import type {
+  BaselineSpec,
+  ComparisonOptions,
+  AnalysisResult,
+  AnalysisFailure
+} from './benchmark-diff.mjs';
 
 type BenchmarkLogger = {
   log (message?: any, ...optionalParams: any[]): void;
@@ -132,9 +139,15 @@ export type {
   AsyncBenchmarkFunction,
   SyncBenchmarkRegistration,
   AsyncBenchmarkRegistration,
-  BenchmarkRegistration
+  BenchmarkRegistration,
+  // New types for benchmark diff with baseline
+  BaselineSpec,
+  ComparisonOptions,
+  AnalysisResult,
+  AnalysisFailure
 };
 
 export {
-  runBenchmark
+  runBenchmark,
+  benchmarkDiffWithBaseline
 };
