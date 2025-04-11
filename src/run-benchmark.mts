@@ -8,30 +8,56 @@ import type {
   BenchmarkTarget,
 } from './suite-setup.mjs';
 
+/**
+ * Interface for logging benchmark progress and results
+ */
 export type BenchmarkLogger = {
   log (message?: any, ...optionalParams: any[]): void;
   error (message?: any, ...optionalParams: any[]): void;
 };
+
+/**
+ * Event triggered when a benchmark is aborted
+ * @internal
+ */
 type BenchmarkAbortEvent = {
   type: string,
   timeStamp: string
 };
+
+/**
+ * Event triggered after each benchmark cycle
+ * @internal
+ */
 type BenchmarkCycleEvent = {
   type: string,
   target: Benchmark,
   currentTarget: Benchmark[]
 };
+
+/**
+ * Event triggered when a benchmark encounters an error
+ * @internal
+ */
 type BenchmarkErrorEvent = {
   type: string,
   target: Benchmark
 };
+
+/**
+ * Options for configuring benchmark execution
+ */
 export type BenchmarkOptions = {
-  logger?: BenchmarkLogger
+  logger?: BenchmarkLogger  // Optional custom logger
 };
 
 const zf = (n: number, len = 2) => String(n).padStart(len, '0');
 const timestampString = (d = new Date()) => `${d.getFullYear()}${zf(d.getMonth() + 1)}${zf(d.getDate())}${zf(d.getHours())}${zf(d.getMinutes())}${zf(d.getSeconds())}${zf(d.getMilliseconds(), 3)}`;
 
+/**
+ * Default console-based implementation of BenchmarkLogger
+ * @internal
+ */
 class ConsoleLogger {
   log (message?: any, ...optionalParams: any[]): void {
     console.log(message, ...optionalParams);
@@ -42,12 +68,27 @@ class ConsoleLogger {
   }
 }
 
+/**
+ * Type assertion to ensure logger is defined
+ * @internal
+ *
+ * @param logger - The logger to check
+ * @throws Error if logger is undefined
+ */
 function assertLoggerExists (logger: BenchmarkLogger | undefined): asserts logger is BenchmarkLogger {
   if (logger === undefined) {
     throw new Error('options.logger is undefined');
   }
 }
 
+/**
+ * Runs benchmarks for the given git commits or specs
+ *
+ * @param commitsOrSpecs - Array of benchmark targets to run benchmarks against
+ * @param register - Function that registers the benchmark function
+ * @param options - Configuration options
+ * @returns Promise that resolves with the benchmark suite after all benchmarks have completed
+ */
 export function runBenchmark (commitsOrSpecs: BenchmarkTarget[], register: BenchmarkRegisterFunction, options?: BenchmarkOptions): Promise<Benchmark.Suite> {
   options = Object.assign({
     logger: new ConsoleLogger()

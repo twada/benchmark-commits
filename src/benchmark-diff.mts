@@ -37,9 +37,12 @@ export type AnalysisResult = {
   targetName: string;     // Name of target benchmark
 };
 
+/**
+ * Represents a failure in the performance analysis process
+ */
 export type AnalysisFailure = {
-  type: 'AnalysisFailure';
-  message: string;
+  type: 'AnalysisFailure';  // Type discriminator
+  message: string;          // Human-readable failure message
 };
 
 /**
