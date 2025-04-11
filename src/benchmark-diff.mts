@@ -1,6 +1,7 @@
 import type Benchmark from 'benchmark';
-import { runBenchmark } from './index.mjs';
-import type { BenchmarkLogger, BenchmarkRegisterFunction, BenchmarkTarget } from './index.mjs';
+import { runBenchmark } from './run-benchmark.mjs';
+import type { BenchmarkLogger } from './run-benchmark.mjs';
+import type { BenchmarkRegisterFunction, BenchmarkTarget } from './suite-setup.mjs';
 
 /**
  * Specification for the baseline branch to compare against
