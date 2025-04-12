@@ -6,8 +6,8 @@ import { extract } from 'extract-git-treeish';
 import type { Suite as BenchmarkSuite, Deferred } from 'benchmark';
 import type { SpawnOptionsWithoutStdio } from 'node:child_process';
 
-type NormalizedBenchmarkSpec = { name: string, git: string, prepare: string[], workdir?: string };
-type BenchmarkSpec = { name: string, git: string, prepare?: string[], workdir?: string };
+type NormalizedBenchmarkSpec = { name: string, git: string, prepare: string[], workdir?: string | undefined };
+type BenchmarkSpec = { name: string, git: string, prepare?: string[] | undefined, workdir?: string | undefined };
 type BenchmarkTarget = BenchmarkSpec | string;
 type BenchmarkInstallation = { spec: NormalizedBenchmarkSpec, dir: string };
 type SyncBenchmarkFunction = () => void;
