@@ -19,6 +19,9 @@ export type {
   AnalysisFailure
 } from './benchmark-diff.mjs';
 export type {
-  BenchmarkLogger,
   BenchmarkOptions
 } from './run-benchmark.mjs';
+
+export type {
+  BenchmarkLogger
+} from './suite-setup.mjs';

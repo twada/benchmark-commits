@@ -1,20 +1,13 @@
 import { join } from 'node:path';
 import { rmSync } from 'node:fs';
 import Benchmark from 'benchmark';
-import { setupSuite, normalizeSpecs, benchmarkName } from './suite-setup.mjs';
+import { setupSuite, normalizeSpecs, benchmarkName, ConsoleLogger } from './suite-setup.mjs';
 import type {
   NormalizedBenchmarkSpec,
   BenchmarkRegisterFunction,
   BenchmarkTarget,
+  BenchmarkLogger
 } from './suite-setup.mjs';
-
-/**
- * Interface for logging benchmark progress and results
- */
-export type BenchmarkLogger = {
-  log (message?: any, ...optionalParams: any[]): void;
-  error (message?: any, ...optionalParams: any[]): void;
-};
 
 /**
  * Event triggered when a benchmark is aborted
@@ -55,20 +48,6 @@ const zf = (n: number, len = 2) => String(n).padStart(len, '0');
 const timestampString = (d = new Date()) => `${d.getFullYear()}${zf(d.getMonth() + 1)}${zf(d.getDate())}${zf(d.getHours())}${zf(d.getMinutes())}${zf(d.getSeconds())}${zf(d.getMilliseconds(), 3)}`;
 
 /**
- * Default console-based implementation of BenchmarkLogger
- * @internal
- */
-class ConsoleLogger {
-  log (message?: any, ...optionalParams: any[]): void {
-    console.log(message, ...optionalParams);
-  }
-
-  error (message?: any, ...optionalParams: any[]): void {
-    console.error(message, ...optionalParams);
-  }
-}
-
-/**
  * Type assertion to ensure logger is defined
  * @internal
  *
@@ -96,7 +75,7 @@ export function runBenchmark (commitsOrSpecs: BenchmarkTarget[], register: Bench
   const logger = options.logger;
   assertLoggerExists(logger);
   const destDir = join(process.cwd(), timestampString());
-  const setup = setupSuite(new Benchmark.Suite('benchmark-commits'), destDir);
+  const setup = setupSuite(new Benchmark.Suite('benchmark-commits'), destDir, logger);
   setup.on('start', (specs) => {
     logger.log(`start preparation of ${specs.length} benchmarks`);
   });

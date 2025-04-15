@@ -21,27 +21,27 @@ The implementation is divided into two phases:
 
 #### 1.2. Update `run-benchmark.mts`
 
-- [ ] Remove local `BenchmarkLogger` interface definition
-- [ ] Remove local `ConsoleLogger` class implementation
-- [ ] Import `BenchmarkLogger` and `ConsoleLogger` from `suite-setup.mts`
-- [ ] Update `setupSuite` call to pass the logger
-- [ ] Keep `BenchmarkOptions` type that references the imported `BenchmarkLogger`
+- [x] Remove local `BenchmarkLogger` interface definition
+- [x] Remove local `ConsoleLogger` class implementation
+- [x] Import `BenchmarkLogger` and `ConsoleLogger` from `suite-setup.mts`
+- [x] Update `setupSuite` call to pass the logger
+- [x] Keep `BenchmarkOptions` type that references the imported `BenchmarkLogger`
 
 #### 1.3. Update `benchmark-diff.mts`
 
-- [ ] Remove local `ConsoleLogger` class if present
-- [ ] Import `ConsoleLogger` from `suite-setup.mts`
-- [ ] Keep references to `BenchmarkLogger` updated with the new import
+- [x] Remove local `ConsoleLogger` class if present
+- [x] Import `ConsoleLogger` from `suite-setup.mts`
+- [x] Keep references to `BenchmarkLogger` updated with the new import
 
 #### 1.4. Update `index.mts`
 
-- [ ] Export `BenchmarkLogger` type from `suite-setup.mts`
+- [x] Export `BenchmarkLogger` type from `suite-setup.mts`
 
 #### 1.5. Verify type-level changes
 
-- [ ] Run TypeScript compiler to verify no type errors
-- [ ] Run existing tests to ensure they still pass
-- [ ] Run linting to ensure code style compliance
+- [x] Run TypeScript compiler to verify no type errors
+- [x] Run existing tests to ensure they still pass
+- [x] Run linting to ensure code style compliance
 
 ### Phase 2: Implementing Error Logging Functionality
 

@@ -1,7 +1,7 @@
 import type Benchmark from 'benchmark';
 import { runBenchmark } from './run-benchmark.mjs';
-import type { BenchmarkLogger } from './run-benchmark.mjs';
-import type { BenchmarkRegisterFunction, BenchmarkTarget } from './suite-setup.mjs';
+import { ConsoleLogger } from './suite-setup.mjs';
+import type { BenchmarkRegisterFunction, BenchmarkTarget, BenchmarkLogger } from './suite-setup.mjs';
 
 /**
  * Specification for the baseline branch to compare against
@@ -45,18 +45,7 @@ export type AnalysisFailure = {
   message: string;          // Human-readable failure message
 };
 
-/**
- * Console-based implementation of BenchmarkLogger
- */
-class ConsoleLogger implements BenchmarkLogger {
-  log (message?: any, ...optionalParams: any[]): void {
-    console.log(message, ...optionalParams);
-  }
-
-  error (message?: any, ...optionalParams: any[]): void {
-    console.error(message, ...optionalParams);
-  }
-}
+// ConsoleLogger is now imported from suite-setup.mts
 
 /**
  * Logs the comparison result in a formatted way
