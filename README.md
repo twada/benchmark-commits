@@ -37,9 +37,10 @@ npm install @twada/benchmark-commits
 - **Promise Support**: First-class support for async/await and Promise-based benchmarks
 - **Flexible Configuration**: Customize preparation steps for each commit/version
 - **Monorepo Support**: Specify workdir to benchmark subprojects in monorepos
-- **Error Handling**: Robust error handling for both sync and async benchmarks
+- **Enhanced Error Handling**: Comprehensive error logging with customizable logger implementations
 - **Optimization Prevention**: Blackhole feature to prevent JIT compiler optimizations from affecting benchmark results
 - **Performance Validation**: Compare current branch against a baseline with configurable thresholds for CI/CD
+- **Custom Logging**: Implement custom error and event logging for better debugging and analysis
 
 ## Usage Examples
 
@@ -192,9 +193,10 @@ Runs benchmarks for the given git commits or specs, using the provided register 
     - `dir`: The directory path to the prepared git checkout (concatenated with `workdir` if exists)
     - `syncBench`: Function to register a synchronous benchmark
     - `asyncBench`: Function to register an asynchronous benchmark
+    - `blackhole`: Function to prevent JIT optimization
 
 - **options**: `BenchmarkOptions` (optional)
-  - `logger`: Custom logger object (defaults to console)
+  - `logger`: Custom logger object (defaults to console) that implements the `BenchmarkLogger` interface
 
 #### Returns:
 
@@ -234,6 +236,12 @@ Runs a performance comparison between the current branch (or specified target br
 ### Type Definitions
 
 ```typescript
+// Benchmark logger interface for custom implementations
+type BenchmarkLogger = {
+  log(message?: any, ...optionalParams: any[]): void;
+  error(message?: any, ...optionalParams: any[]): void;
+};
+
 // Benchmark specification object
 type BenchmarkSpec = {
   name: string;
@@ -313,6 +321,65 @@ runBenchmark(specs, ({ syncBench, blackhole }) => {
 ```
 
 The `blackhole` function is implemented to have minimal overhead while reliably preventing optimization.
+
+### Custom Error Logging with BenchmarkLogger
+
+You can implement custom error logging by providing a logger object that implements the `BenchmarkLogger` interface:
+
+```javascript
+import { runBenchmark } from '@twada/benchmark-commits';
+
+// Create a custom logger
+class CustomLogger {
+  constructor() {
+    this.errors = [];
+  }
+
+  log(message, ...params) {
+    console.log(`[LOG] ${message}`, ...params);
+  }
+
+  error(message, ...params) {
+    // Capture the error for later analysis
+    this.errors.push({
+      message,
+      error: params[0] instanceof Error ? params[0] : null,
+      timestamp: new Date().toISOString()
+    });
+    // Still log to console
+    console.error(`[ERROR] ${message}`, ...params);
+  }
+
+  // Custom method for error analysis
+  getErrorSummary() {
+    return {
+      count: this.errors.length,
+      errors: this.errors
+    };
+  }
+}
+
+// Use the custom logger
+const logger = new CustomLogger();
+
+runBenchmark(specs, ({ asyncBench }) => {
+  return asyncBench(async () => {
+    // Benchmark code...
+  });
+}, { logger });
+
+// After benchmarks complete, you can analyze errors
+console.log(`Total errors: ${logger.errors.length}`);
+if (logger.errors.length > 0) {
+  console.log(logger.getErrorSummary());
+}
+```
+
+This is particularly useful for:
+- Capturing and analyzing benchmark errors across multiple runs
+- Centralized error handling for CI/CD pipelines
+- Creating custom error reports with additional context
+- Error-based alerting or notifications
 
 ## Internal Architecture
 

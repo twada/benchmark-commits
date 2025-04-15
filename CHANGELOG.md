@@ -9,6 +9,11 @@
   * Add support for CI/CD integration with exit code control
   * Add detailed performance reporting with pass/fail indicators
   * Add comprehensive documentation and usage examples
+* Improve error logging in benchmark execution ([ADR-005](./docs/adr-005-error-logging-in-suite-setup.en.md))
+  * Add proper error reporting for asynchronous benchmark failures
+  * Move BenchmarkLogger interface to suite-setup module
+  * Support custom logger implementations for better debugging
+  * Add example of custom logger implementation
 
 
 ## [0.4.0](http://github.com/twada/benchmark-commits/releases/tag/v0.4.0) (2025-04-07)

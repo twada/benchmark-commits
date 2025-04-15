@@ -6,6 +6,27 @@ import { extract } from 'extract-git-treeish';
 import type { Suite as BenchmarkSuite, Deferred } from 'benchmark';
 import type { SpawnOptionsWithoutStdio } from 'node:child_process';
 
+/**
+ * Interface for logging benchmark progress and results
+ */
+export type BenchmarkLogger = {
+  log (message?: any, ...optionalParams: any[]): void;
+  error (message?: any, ...optionalParams: any[]): void;
+};
+
+/**
+ * Default console-based implementation of BenchmarkLogger
+ */
+export class ConsoleLogger implements BenchmarkLogger {
+  log (message?: any, ...optionalParams: any[]): void {
+    console.log(message, ...optionalParams);
+  }
+
+  error (message?: any, ...optionalParams: any[]): void {
+    console.error(message, ...optionalParams);
+  }
+}
+
 type NormalizedBenchmarkSpec = { name: string, git: string, prepare: string[], workdir?: string | undefined };
 type BenchmarkSpec = { name: string, git: string, prepare?: string[] | undefined, workdir?: string | undefined };
 type BenchmarkTarget = BenchmarkSpec | string;
@@ -26,14 +47,30 @@ type BenchmarkArguments = {
 };
 type BenchmarkRegisterFunction = (benchmarkArguments: BenchmarkArguments) => BenchmarkRegistration | Promise<BenchmarkRegistration>;
 
+/**
+ * Class to setup and manage benchmark suites
+ * Handles git checkout, preparation steps, and benchmark registration
+ */
 class SuiteSetup extends EventEmitter {
+  /** The benchmark suite being configured */
   readonly suite: BenchmarkSuite;
+  /** The working directory for benchmark files */
   readonly workDir: string;
+  /** Logger for benchmark results and errors */
+  readonly logger: BenchmarkLogger;
 
-  constructor (suite: BenchmarkSuite, workDir: string) {
+  /**
+   * Creates a new SuiteSetup instance
+   *
+   * @param suite - The benchmark suite to configure
+   * @param workDir - The working directory for benchmark files
+   * @param logger - Optional logger for benchmark results and errors (defaults to ConsoleLogger)
+   */
+  constructor (suite: BenchmarkSuite, workDir: string, logger: BenchmarkLogger = new ConsoleLogger()) {
     super();
     this.suite = suite;
     this.workDir = workDir;
+    this.logger = logger;
   }
 
   run (specs: NormalizedBenchmarkSpec[], register: BenchmarkRegisterFunction): Promise<BenchmarkSuite> {
@@ -103,7 +140,7 @@ function runSetup (setup: SuiteSetup, specs: NormalizedBenchmarkSpec[], register
         if (typeof registration === 'object' && registration !== null && Object.hasOwn(registration, 'async') && Object.hasOwn(registration, 'fn') && typeof registration.fn === 'function') {
           if (registration.async) {
             // Async benchmark
-            const wrappedFn = wrapPromiseBenchmark(registration.fn);
+            const wrappedFn = wrapPromiseBenchmark(registration.fn, setup.logger);
             suite.add(benchmarkName(spec), wrappedFn, { defer: true });
           } else {
             // Sync benchmark
@@ -149,12 +186,20 @@ function benchmarkName (spec: BenchmarkSpec): string {
   }
 }
 
-function wrapPromiseBenchmark (fn: AsyncBenchmarkFunction): AsyncDeferredFunction {
+/**
+ * Wraps an async benchmark function that returns a Promise for use with deferred benchmark
+ *
+ * @param fn - The async benchmark function to wrap
+ * @param logger - The logger to use for error reporting
+ * @returns A function compatible with deferred benchmarks
+ */
+function wrapPromiseBenchmark (fn: AsyncBenchmarkFunction, logger: BenchmarkLogger): AsyncDeferredFunction {
   return function (deferred: Deferred) {
     fn().then(() => {
       deferred.resolve();
-    }).catch(_err => {
-      // TODO: propagate error report to the suite logger
+    }).catch(err => {
+      // Propagate error to the logger
+      logger.error(`Benchmark execution error: ${err.message}`, err);
       deferred.benchmark.abort();
       deferred.resolve();
     });
@@ -178,8 +223,16 @@ const blackhole = (() => {
   };
 })();
 
-function setupSuite (suite: BenchmarkSuite, workDir: string): SuiteSetup {
-  return new SuiteSetup(suite, workDir);
+/**
+ * Creates and configures a new benchmark suite setup
+ *
+ * @param suite - The benchmark suite to configure
+ * @param workDir - The working directory for benchmark files
+ * @param logger - Optional logger for benchmark results and errors
+ * @returns A configured SuiteSetup instance
+ */
+function setupSuite (suite: BenchmarkSuite, workDir: string, logger?: BenchmarkLogger): SuiteSetup {
+  return new SuiteSetup(suite, workDir, logger);
 }
 
 export type {
