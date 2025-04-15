@@ -10,7 +10,8 @@ export type {
   AsyncBenchmarkFunction,
   SyncBenchmarkRegistration,
   AsyncBenchmarkRegistration,
-  BenchmarkRegistration
+  BenchmarkRegistration,
+  BenchmarkLogger
 } from './suite-setup.mjs';
 export type {
   BaselineSpec,
@@ -21,7 +22,3 @@ export type {
 export type {
   BenchmarkOptions
 } from './run-benchmark.mjs';
-
-export type {
-  BenchmarkLogger
-} from './suite-setup.mjs';
