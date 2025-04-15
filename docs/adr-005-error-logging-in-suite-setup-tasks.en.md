@@ -47,19 +47,19 @@ The implementation is divided into two phases:
 
 #### 2.1. Update `wrapPromiseBenchmark` in `suite-setup.mts`
 
-- [ ] Modify signature to accept a logger parameter
-- [ ] Implement error logging in the catch block
-- [ ] Update all calls to `wrapPromiseBenchmark` to pass the logger
+- [x] Modify signature to accept a logger parameter
+- [x] Implement error logging in the catch block
+- [x] Update all calls to `wrapPromiseBenchmark` to pass the logger
 
 #### 2.2. Update `runSetup` function in `suite-setup.mts`
 
-- [ ] Ensure `wrapPromiseBenchmark` is called with the logger
+- [x] Ensure `wrapPromiseBenchmark` is called with the logger
 
 #### 2.3. Create tests for error logging
 
-- [ ] Create a mock logger for testing
-- [ ] Add tests for asynchronous benchmark failures
-- [ ] Verify error messages are properly logged
+- [x] Create a mock logger for testing
+- [x] Add tests for asynchronous benchmark failures
+- [x] Verify error messages are properly logged
 
 #### 2.4. Documentation
 

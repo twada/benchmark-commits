@@ -126,7 +126,7 @@ function runSetup (setup: SuiteSetup, specs: NormalizedBenchmarkSpec[], register
         if (typeof registration === 'object' && registration !== null && Object.hasOwn(registration, 'async') && Object.hasOwn(registration, 'fn') && typeof registration.fn === 'function') {
           if (registration.async) {
             // Async benchmark
-            const wrappedFn = wrapPromiseBenchmark(registration.fn);
+            const wrappedFn = wrapPromiseBenchmark(registration.fn, setup.logger);
             suite.add(benchmarkName(spec), wrappedFn, { defer: true });
           } else {
             // Sync benchmark
@@ -172,12 +172,13 @@ function benchmarkName (spec: BenchmarkSpec): string {
   }
 }
 
-function wrapPromiseBenchmark (fn: AsyncBenchmarkFunction): AsyncDeferredFunction {
+function wrapPromiseBenchmark (fn: AsyncBenchmarkFunction, logger: BenchmarkLogger): AsyncDeferredFunction {
   return function (deferred: Deferred) {
     fn().then(() => {
       deferred.resolve();
-    }).catch(_err => {
-      // TODO: propagate error report to the suite logger
+    }).catch(err => {
+      // Propagate error to the logger
+      logger.error(`Benchmark execution error: ${err.message}`, err);
       deferred.benchmark.abort();
       deferred.resolve();
     });
