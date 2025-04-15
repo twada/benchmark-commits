@@ -233,65 +233,6 @@ Runs a performance comparison between the current branch (or specified target br
   - `suite`: The benchmark suite after completion
   - `result`: Analysis result with performance metrics and pass/fail status
 
-### Custom Error Logging with BenchmarkLogger
-
-You can implement custom error logging by providing a logger object that implements the `BenchmarkLogger` interface:
-
-```javascript
-import { runBenchmark } from '@twada/benchmark-commits';
-
-// Create a custom logger
-class CustomLogger {
-  constructor() {
-    this.errors = [];
-  }
-
-  log(message, ...params) {
-    console.log(`[LOG] ${message}`, ...params);
-  }
-
-  error(message, ...params) {
-    // Capture the error for later analysis
-    this.errors.push({
-      message,
-      error: params[0] instanceof Error ? params[0] : null,
-      timestamp: new Date().toISOString()
-    });
-    // Still log to console
-    console.error(`[ERROR] ${message}`, ...params);
-  }
-
-  // Custom method for error analysis
-  getErrorSummary() {
-    return {
-      count: this.errors.length,
-      errors: this.errors
-    };
-  }
-}
-
-// Use the custom logger
-const logger = new CustomLogger();
-
-runBenchmark(specs, ({ asyncBench }) => {
-  return asyncBench(async () => {
-    // Benchmark code...
-  });
-}, { logger });
-
-// After benchmarks complete, you can analyze errors
-console.log(`Total errors: ${logger.errors.length}`);
-if (logger.errors.length > 0) {
-  console.log(logger.getErrorSummary());
-}
-```
-
-This is particularly useful for:
-- Capturing and analyzing benchmark errors across multiple runs
-- Centralized error handling for CI/CD pipelines
-- Creating custom error reports with additional context
-- Error-based alerting or notifications
-
 ### Type Definitions
 
 ```typescript
@@ -380,6 +321,65 @@ runBenchmark(specs, ({ syncBench, blackhole }) => {
 ```
 
 The `blackhole` function is implemented to have minimal overhead while reliably preventing optimization.
+
+### Custom Error Logging with BenchmarkLogger
+
+You can implement custom error logging by providing a logger object that implements the `BenchmarkLogger` interface:
+
+```javascript
+import { runBenchmark } from '@twada/benchmark-commits';
+
+// Create a custom logger
+class CustomLogger {
+  constructor() {
+    this.errors = [];
+  }
+
+  log(message, ...params) {
+    console.log(`[LOG] ${message}`, ...params);
+  }
+
+  error(message, ...params) {
+    // Capture the error for later analysis
+    this.errors.push({
+      message,
+      error: params[0] instanceof Error ? params[0] : null,
+      timestamp: new Date().toISOString()
+    });
+    // Still log to console
+    console.error(`[ERROR] ${message}`, ...params);
+  }
+
+  // Custom method for error analysis
+  getErrorSummary() {
+    return {
+      count: this.errors.length,
+      errors: this.errors
+    };
+  }
+}
+
+// Use the custom logger
+const logger = new CustomLogger();
+
+runBenchmark(specs, ({ asyncBench }) => {
+  return asyncBench(async () => {
+    // Benchmark code...
+  });
+}, { logger });
+
+// After benchmarks complete, you can analyze errors
+console.log(`Total errors: ${logger.errors.length}`);
+if (logger.errors.length > 0) {
+  console.log(logger.getErrorSummary());
+}
+```
+
+This is particularly useful for:
+- Capturing and analyzing benchmark errors across multiple runs
+- Centralized error handling for CI/CD pipelines
+- Creating custom error reports with additional context
+- Error-based alerting or notifications
 
 ## Internal Architecture
 
