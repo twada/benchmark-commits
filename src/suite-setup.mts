@@ -6,6 +6,27 @@ import { extract } from 'extract-git-treeish';
 import type { Suite as BenchmarkSuite, Deferred } from 'benchmark';
 import type { SpawnOptionsWithoutStdio } from 'node:child_process';
 
+/**
+ * Interface for logging benchmark progress and results
+ */
+export type BenchmarkLogger = {
+  log (message?: any, ...optionalParams: any[]): void;
+  error (message?: any, ...optionalParams: any[]): void;
+};
+
+/**
+ * Default console-based implementation of BenchmarkLogger
+ */
+export class ConsoleLogger implements BenchmarkLogger {
+  log (message?: any, ...optionalParams: any[]): void {
+    console.log(message, ...optionalParams);
+  }
+
+  error (message?: any, ...optionalParams: any[]): void {
+    console.error(message, ...optionalParams);
+  }
+}
+
 type NormalizedBenchmarkSpec = { name: string, git: string, prepare: string[], workdir?: string | undefined };
 type BenchmarkSpec = { name: string, git: string, prepare?: string[] | undefined, workdir?: string | undefined };
 type BenchmarkTarget = BenchmarkSpec | string;
@@ -29,11 +50,13 @@ type BenchmarkRegisterFunction = (benchmarkArguments: BenchmarkArguments) => Ben
 class SuiteSetup extends EventEmitter {
   readonly suite: BenchmarkSuite;
   readonly workDir: string;
+  readonly logger: BenchmarkLogger;
 
-  constructor (suite: BenchmarkSuite, workDir: string) {
+  constructor (suite: BenchmarkSuite, workDir: string, logger: BenchmarkLogger = new ConsoleLogger()) {
     super();
     this.suite = suite;
     this.workDir = workDir;
+    this.logger = logger;
   }
 
   run (specs: NormalizedBenchmarkSpec[], register: BenchmarkRegisterFunction): Promise<BenchmarkSuite> {
@@ -178,8 +201,8 @@ const blackhole = (() => {
   };
 })();
 
-function setupSuite (suite: BenchmarkSuite, workDir: string): SuiteSetup {
-  return new SuiteSetup(suite, workDir);
+function setupSuite (suite: BenchmarkSuite, workDir: string, logger?: BenchmarkLogger): SuiteSetup {
+  return new SuiteSetup(suite, workDir, logger);
 }
 
 export type {

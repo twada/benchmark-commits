@@ -12,12 +12,12 @@ The implementation is divided into two phases:
 
 #### 1.1. Update `suite-setup.mts`
 
-- [ ] Add `BenchmarkLogger` interface definition
-- [ ] Add `ConsoleLogger` class implementation
-- [ ] Add logger property to `SuiteSetup` class
-- [ ] Update `SuiteSetup` constructor to accept optional logger parameter (with default implementation)
-- [ ] Update `setupSuite` function to accept optional logger parameter
-- [ ] Export `BenchmarkLogger` type and `ConsoleLogger` class
+- [x] Add `BenchmarkLogger` interface definition
+- [x] Add `ConsoleLogger` class implementation
+- [x] Add logger property to `SuiteSetup` class
+- [x] Update `SuiteSetup` constructor to accept optional logger parameter (with default implementation)
+- [x] Update `setupSuite` function to accept optional logger parameter
+- [x] Export `BenchmarkLogger` type and `ConsoleLogger` class
 
 #### 1.2. Update `run-benchmark.mts`
 
