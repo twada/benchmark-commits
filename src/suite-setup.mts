@@ -47,11 +47,25 @@ type BenchmarkArguments = {
 };
 type BenchmarkRegisterFunction = (benchmarkArguments: BenchmarkArguments) => BenchmarkRegistration | Promise<BenchmarkRegistration>;
 
+/**
+ * Class to setup and manage benchmark suites
+ * Handles git checkout, preparation steps, and benchmark registration
+ */
 class SuiteSetup extends EventEmitter {
+  /** The benchmark suite being configured */
   readonly suite: BenchmarkSuite;
+  /** The working directory for benchmark files */
   readonly workDir: string;
+  /** Logger for benchmark results and errors */
   readonly logger: BenchmarkLogger;
 
+  /**
+   * Creates a new SuiteSetup instance
+   *
+   * @param suite - The benchmark suite to configure
+   * @param workDir - The working directory for benchmark files
+   * @param logger - Optional logger for benchmark results and errors (defaults to ConsoleLogger)
+   */
   constructor (suite: BenchmarkSuite, workDir: string, logger: BenchmarkLogger = new ConsoleLogger()) {
     super();
     this.suite = suite;
@@ -172,6 +186,13 @@ function benchmarkName (spec: BenchmarkSpec): string {
   }
 }
 
+/**
+ * Wraps an async benchmark function that returns a Promise for use with deferred benchmark
+ *
+ * @param fn - The async benchmark function to wrap
+ * @param logger - The logger to use for error reporting
+ * @returns A function compatible with deferred benchmarks
+ */
 function wrapPromiseBenchmark (fn: AsyncBenchmarkFunction, logger: BenchmarkLogger): AsyncDeferredFunction {
   return function (deferred: Deferred) {
     fn().then(() => {
@@ -202,6 +223,14 @@ const blackhole = (() => {
   };
 })();
 
+/**
+ * Creates and configures a new benchmark suite setup
+ *
+ * @param suite - The benchmark suite to configure
+ * @param workDir - The working directory for benchmark files
+ * @param logger - Optional logger for benchmark results and errors
+ * @returns A configured SuiteSetup instance
+ */
 function setupSuite (suite: BenchmarkSuite, workDir: string, logger?: BenchmarkLogger): SuiteSetup {
   return new SuiteSetup(suite, workDir, logger);
 }
