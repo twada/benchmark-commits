@@ -1,5 +1,5 @@
-export { benchmarkDiffWithBaseline } from './benchmark-diff.mjs';
-export { runBenchmark } from './run-benchmark.mjs';
+export { benchmarkDiffWithBaseline } from './benchmark-diff.mts';
+export { runBenchmark } from './run-benchmark.mts';
 export type {
   BenchmarkSpec,
   NormalizedBenchmarkSpec,
@@ -12,13 +12,13 @@ export type {
   AsyncBenchmarkRegistration,
   BenchmarkRegistration,
   BenchmarkLogger
-} from './suite-setup.mjs';
+} from './suite-setup.mts';
 export type {
   BaselineSpec,
   ComparisonOptions,
   AnalysisResult,
   AnalysisFailure
-} from './benchmark-diff.mjs';
+} from './benchmark-diff.mts';
 export type {
   BenchmarkOptions
-} from './run-benchmark.mjs';
+} from './run-benchmark.mts';

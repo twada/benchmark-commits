@@ -1,4 +1,4 @@
-import { runBenchmark } from '../index.mjs';
+import { runBenchmark } from '../index.mts';
 import { describe, it } from 'node:test';
 import { strict as assert } from 'node:assert';
 import { createRequire } from 'node:module';

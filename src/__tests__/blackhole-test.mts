@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { blackhole } from '../suite-setup.mjs';
+import { blackhole } from '../suite-setup.mts';
 
 test('blackhole function should not throw any errors', () => {
   // Check that blackhole accepts various value types without throwing errors

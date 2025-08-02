@@ -44,13 +44,17 @@
   ],
   "scripts": {
     "example": "node --experimental-strip-types examples/run-async.mts",
+    "preversion": "npm run rebuild",
+    "rebuild": "npm run lint && npm run clean && npm run compile && npm run test:dist",
+    "clean": "rimraf dist",
+    "compile": "tsc",
     "typecheck": "tsc --noEmit",
-    "build": "rimraf dist && tsc",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
-    "test:unit": "node --enable-source-maps --test \"./dist/__tests__/*test.mjs\"",
-    "test:doc": "node --enable-source-maps --test-reporter node-descmd-reporter --test \"./dist/__tests__/*test.mjs\"",
-    "test": "npm run lint && npm run build && npm run test:unit"
+    "test:dist": "node --enable-source-maps --test \"./dist/__tests__/*test.mjs\"",
+    "test:unit": "node --test \"./src/__tests__/*test.mts\"",
+    "test:doc": "node --test-reporter node-descmd-reporter --test \"./src/__tests__/*test.mts\"",
+    "test": "npm run lint && npm run test:unit"
   },
   "dependencies": {
     "benchmark": "^2.1.4",

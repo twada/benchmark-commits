@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import { strict as assert } from 'node:assert';
 import Benchmark from 'benchmark';
-import { analyzePerformanceResults } from '../benchmark-diff.mjs';
+import { analyzePerformanceResults } from '../benchmark-diff.mts';
 
 describe('analyzePerformanceResults', () => {
   // Helper function is intentionally commented out as it's not used directly,

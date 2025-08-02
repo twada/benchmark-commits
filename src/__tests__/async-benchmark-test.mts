@@ -1,4 +1,4 @@
-import { setupSuite, wrapPromiseBenchmark } from '../suite-setup.mjs';
+import { setupSuite, wrapPromiseBenchmark } from '../suite-setup.mts';
 import { describe, it, beforeEach, afterEach } from 'node:test';
 import { tmpdir } from 'node:os';
 import { existsSync, rmSync } from 'node:fs';
@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { strict as assert } from 'node:assert';
 import { EventEmitter } from 'node:events';
 import type { Suite as BenchmarkSuite, Options as BenchmarkOptions, Deferred } from 'benchmark';
-import type { NormalizedBenchmarkSpec, BenchmarkLogger } from '../suite-setup.mjs';
+import type { NormalizedBenchmarkSpec, BenchmarkLogger } from '../suite-setup.mts';
 
 const zf = (n: number, len = 2) => String(n).padStart(len, '0');
 const timestampString = (d = new Date()) => `${d.getFullYear()}${zf(d.getMonth() + 1)}${zf(d.getDate())}${zf(d.getHours())}${zf(d.getMinutes())}${zf(d.getSeconds())}${zf(d.getMilliseconds(), 3)}`;
