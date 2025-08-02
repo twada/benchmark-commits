@@ -7,6 +7,8 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
+    "rewriteRelativeImportExtensions": true,
+    "erasableSyntaxOnly": true,
     // any imports or exports without a type modifier are left around
     "verbatimModuleSyntax": true,
     "allowSyntheticDefaultImports": true,
