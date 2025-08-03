@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { parseCommandLine } from '../suite-setup.mjs';
+import { parseCommandLine } from '../suite-setup.mts';
 
 describe('parseCommandLine', () => {
   it('./setup.sh', () => {

@@ -1,4 +1,4 @@
-import { setupSuite, normalizeSpecs, benchmarkName } from '../suite-setup.mjs';
+import { setupSuite, normalizeSpecs, benchmarkName } from '../suite-setup.mts';
 import { describe, it, beforeEach, afterEach } from 'node:test';
 import { tmpdir } from 'node:os';
 import { existsSync, rmSync } from 'node:fs';
@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { strict as assert } from 'node:assert';
 import { EventEmitter } from 'node:events';
 import type { Suite as BenchmarkSuite, Options as BenchmarkOptions } from 'benchmark';
-import type { NormalizedBenchmarkSpec } from '../suite-setup.mjs';
+import type { NormalizedBenchmarkSpec } from '../suite-setup.mts';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const zf = (n: number, len = 2) => String(n).padStart(len, '0');

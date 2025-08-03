@@ -1,13 +1,13 @@
 import { join } from 'node:path';
 import { rmSync } from 'node:fs';
 import Benchmark from 'benchmark';
-import { setupSuite, normalizeSpecs, benchmarkName, ConsoleLogger } from './suite-setup.mjs';
+import { setupSuite, normalizeSpecs, benchmarkName, ConsoleLogger } from './suite-setup.mts';
 import type {
   NormalizedBenchmarkSpec,
   BenchmarkRegisterFunction,
   BenchmarkTarget,
   BenchmarkLogger
-} from './suite-setup.mjs';
+} from './suite-setup.mts';
 
 /**
  * Event triggered when a benchmark is aborted

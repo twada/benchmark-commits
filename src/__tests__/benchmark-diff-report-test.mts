@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { logComparisonResult } from '../benchmark-diff.mjs';
+import { logComparisonResult } from '../benchmark-diff.mts';
 
 describe('logComparisonResult', () => {
   // Create a mock logger
