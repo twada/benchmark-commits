@@ -59,6 +59,17 @@ This is a Node.js library that enables running benchmarks across multiple git co
 - `extract-git-treeish` - Git checkout operations
 - Minimal runtime dependencies for focused scope
 
+## Development Rules
+
+- Git commit rules must follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
+- Versioning rules must follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
+- CHANGELOG description rules must follow [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+- Development process must follow "t-wada's TDD workflow"
+- Always run `npm run lint` after changing code
+- Run tests `npm test` frequently
+- Small, frequent commits are strongly recommended. Follow Git commit rules and commit by type
+- If type errors are difficult to resolve, stop work and consult before using `any` type
+
 ## Important Notes
 
 - Node.js >= 22.12.0 required
